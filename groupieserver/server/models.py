@@ -1,4 +1,6 @@
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
+
 
 # Create your models here.
 
@@ -43,29 +45,68 @@ class Badge(models.Model):
 	name = models.CharField(max_length=32)
 	points = models.IntegerField(max_length=2, blank=False, default=10)
 
+	# when you join your first group
 	@staticmethod
-	def first_badge():
-		return Badge.objects.get(pk=1)
+	def get_baby_steps_badge():
+		try:
+			return Badge.objects.get(name='Baby steps')
+		except ObjectDoesNotExist:
+			badge = Badge.objects.create(name='Baby steps', points=10)
+			return badge
 
+	# when you first post something on the group
 	@staticmethod
-	def second_badge():
-		return Badge.objects.get(pk=2)
+	def get_is_there_anybody_out_there_badge():
+		try:
+			return Badge.objects.get(name='Is there anybody out there?')
+		except ObjectDoesNotExist:
+			badge = Badge.objects.create(name='Is there anybody out there?', points=20)
+			return badge
 
+	# when you complete your first task
 	@staticmethod
-	def third_badge():
-		return Badge.objects.get(pk=3)
+	def get_well_begun_is_half_done_badge():
+		try:
+			return Badge.objects.get(name='Well begun is half done')
+		except ObjectDoesNotExist:
+			badge = Badge.objects.create(name='Well begun is half done', points=25)
+			return badge
 
+	# when you join 5 groups
 	@staticmethod
-	def fourth_badge():
-		return Badge.objects.get(pk=4)
+	def get_social_climber_badge():
+		try:
+			return Badge.objects.get(name='Social climber')
+		except ObjectDoesNotExist:
+			badge = Badge.objects.create(name='Social climber', points=50)
+			return badge
 
+	# when you complete 10 tasks
 	@staticmethod
-	def fifth_badge():
-		return Badge.objects.get(pk=5)
+	def get_dependable_badge():
+		try:
+			return Badge.objects.get(name='Dependable')
+		except ObjectDoesNotExist:
+			badge = Badge.objects.create(name='Dependable', points=250)
+			return badge
 
+	# when you first become an admin
 	@staticmethod
-	def sixth_badge():
-		return Badge.objects.get(pk=6)
+	def get_worth_following_badge():
+		try:
+			return Badge.objects.get(name='Worth following')
+		except ObjectDoesNotExist:
+			badge = Badge.objects.create(name='Worth following', points=100)
+			return badge
+
+	# when you first appear on the leaderboard
+	@staticmethod
+	def get_starstruck_badge():
+		try:
+			return Badge.objects.get(name='Starstruck')
+		except ObjectDoesNotExist:
+			badge = Badge.objects.create(name='Starstruck', points=100)
+			return badge
 
 
 class User(models.Model):

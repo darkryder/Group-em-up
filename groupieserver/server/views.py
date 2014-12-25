@@ -191,8 +191,8 @@ def delete_group(request, pk):
 @csrf_exempt
 def join_group(request, pk):
     response = {'result': False, 'reason': 'nope'}
-    # import pdb
-    # pdb.set_trace()
+    import pdb
+    pdb.set_trace()
     user = is_logged_in(request)
     if user:
         group = Group.objects.filter(pk=pk)
@@ -202,6 +202,23 @@ def join_group(request, pk):
             group.save()
             response['result'] = True
             response['message'] = "Welcome to %s"%group.name
+
+            badge = Badge.get_baby_steps_badge()
+            if badge not in user.badges.all():
+                user.badges.add(badge)
+                user.points += badge.points
+                user.save()
+                badge.save()
+
+            badge = Badge.get_social_climber_badge()
+            if user.groups.count() >= 5:
+                if badge not in user.badges.all():
+                    user.badges.add(badge)
+                    user.points += badge.points
+                    user.save()
+                    badge.save()
+
+
         else:
             response['reason'] = "No Group with this  PK found"
     else:
@@ -213,6 +230,9 @@ def leave_group(request, pk):
     response = {'result': False, 'reason': 'nope'}
     # import pdb
     # pdb.set_trace()
+
+    #TODO
+    # don't allow admins to leave groups
     user = is_logged_in(request)
     if user:
         group = Group.objects.filter(pk=pk)
@@ -228,6 +248,86 @@ def leave_group(request, pk):
                 response['reason'] = "You were not a part of the group"
         else:
             response['reason'] = "No Group with this  PK found"
+    else:
+        response['reason'] = "not logged in"
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+@csrf_exempt
+def assign_admin(request, group_pk, person_pk):
+    response = {'result': False, 'reason': 'nope'}
+    # import pdb
+    # pdb.set_trace()
+    user = is_logged_in(request)
+    if user:
+        group = Group.objects.filter(pk=group_pk)
+        person = User.objects.filter(pk=person_pk)
+
+        if group and person:
+            group, person = group[0], person[0]
+
+            if user not in group.admins.all():
+                response['reason'] = "You don't have permission to perform this action"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+            
+            if not person in group.members.all():
+                response['reason'] = "The person should be a member of this group"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
+            if person in group.admins.all():
+                response['reason'] = "The person is already an admin of this group"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
+            person.adminOf.add(group)
+            person.save()
+            group.save()
+            response['result'] = True
+            response['message'] = "added as admin"
+
+            badge = Badge.get_worth_following_badge()
+            if badge not in person.badges.all():
+                person.badges.add(badge)
+                person.points += badge.points
+                person.save()
+                badge.save()
+        else: 
+            response['reason'] = "No group or person with this  PK found"
+    else:
+        response['reason'] = "not logged in"
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+
+@csrf_exempt
+def remove_admin(request, group_pk, person_pk):
+    response = {'result': False, 'reason': 'nope'}
+    # import pdb
+    # pdb.set_trace()
+    user = is_logged_in(request)
+    if user:
+        group = Group.objects.filter(pk=group_pk)
+        person = User.objects.filter(pk=person_pk)
+
+        if group and person:
+            group, person = group[0], person[0]
+
+            if user not in group.admins.all():
+                response['reason'] = "You don't have permission to perform this action"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+            
+            if not person in group.members.all():
+                response['reason'] = "The person should be a member of this group"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
+            if person not in group.admins.all():
+                response['reason'] = "The person is already not an admin"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
+            person.adminOf.remove(group)
+            person.save()
+            group.save()
+            response['result'] = True
+            response['message'] = "Removed as an admin"
+        else: 
+            response['reason'] = "No group or person with this  PK found"
     else:
         response['reason'] = "not logged in"
     return HttpResponse(json.dumps(response), content_type="application/json")
@@ -254,6 +354,14 @@ def create_new_post(request, group_pk):
                     response['result']=True
                     response['message'] = "Posted"
                     response['data'] = {"pk": post.pk}
+
+                    badge = Badge.get_is_there_anybody_out_there_badge()
+                    if badge not in user.badges.all():
+                        user.badges.add(badge)
+                        user.points += badge.points
+                        user.save()
+                        badge.save()
+
                 except:
                     response['reason'] = "Incomplete Data"
             else:
@@ -325,9 +433,9 @@ def create_task(request, group_pk):
         group = Group.objects.filter(pk=group_pk)
         if group:
             group = group[0]
-            if user not in group.admins.all():
-                response['reason'] = "You're not an admin of this group"
-                return HttpResponse(json.dumps(response), content_type="application/json")
+            # if user not in group.admins.all():
+            #     response['reason'] = "You're not an admin of this group"
+            #     return HttpResponse(json.dumps(response), content_type="application/json")
             try:
                 task = Task.objects.create(description=request.POST['description'],
                         points = int(request.POST.get('points', 10)))
@@ -363,9 +471,9 @@ def create_task_specific_to_person(request, group_pk, person_pk):
         person = User.objects.filter(pk=person_pk)
         if person and group:
             person, group = person[0], group[0]
-            if user not in group.admins.all():
-                response['reason'] = "You're not an admin of this group"
-                return HttpResponse(json.dumps(response), content_type="application/json")
+            # if user not in group.admins.all():
+            #     response['reason'] = "You're not an admin of this group"
+            #     return HttpResponse(json.dumps(response), content_type="application/json")
             if all([x in group.members.all() for x in [person, user]]):
                 try:
                     task = Task.objects.create(description=request.POST['description'],
@@ -436,12 +544,14 @@ def delete_task(request, pk):
         task = Task.objects.filter(pk=pk)
         if task:
             task = task[0]
-            if user in task.assigner.all():
+            if (user in task.assigner.all()) or (user in task.group.first().admins.all()):
                 task.delete()
+                #TODO
+                # remove points from the person who's completed it
                 response['result']= True
                 response['message'] = "task deleted"
             else:
-                response['reason'] = "You did not start this task."
+                response['reason'] = "You did not start this task and you are not an admin."
         else:
             response['reason'] = "Task with this pk does not exist"
     else:
@@ -518,6 +628,16 @@ def complete_task(request, pk, person_pk):
                 person.save()
                 response['result'] = True
                 response['message'] = "Done"
+
+                badge = Badge.get_well_begun_is_half_done_badge()
+                if badge not in person.badges.all():
+                    person.badges.add(badge)
+                    person.points += badge.points
+                    person.save()
+                    badge.save()
+
+                #TODO 
+                #badge on completing 10 tasks
             else:
                 response['reason'] = "This person was never assigned this task"
         else:
