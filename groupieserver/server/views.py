@@ -69,6 +69,7 @@ def signup(request):
 
     return HttpResponse(json.dumps(response), content_type="application/json")
 
+
 @csrf_exempt
 def get_person_details(request, pk):
     response = {'result': False, 'reason': 'nope'}
@@ -82,7 +83,7 @@ def get_person_details(request, pk):
 
             groups = [{"name": x.name, 'pk': x.pk} for x in person.groups.all()]
             badges = [{"name": x.name} for x in person.badges.all()]
-            tasks = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk} for x in person.tasks.all()]
+            tasks = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk, "description": x.description} for x in person.tasks.all()]
             adminOf = [{"name": x.name, "pk": x.pk} for x in person.adminOf.all()]
             posts = [{"description": x.description} for x in person.posts.all()]
 
@@ -90,6 +91,7 @@ def get_person_details(request, pk):
             response['data'] = {
                     "first_name": person.first_name,
                     "last_name": person.last_name,
+                    "points": person.points,
                     "gender": person.gender,
                     "groups": groups,
                     "badges": badges,
@@ -97,7 +99,8 @@ def get_person_details(request, pk):
                     "adminOf": adminOf,
                     "posts": posts
                 }
-        response['reason'] = "No person with this pk"
+        else:
+            response['reason'] = "No person with this pk"
     else:
         response['reason'] = "not logged in"
     return HttpResponse(json.dumps(response), content_type="application/json")
@@ -111,7 +114,7 @@ def create_group(request):
     if user:
         try:
             group = Group.objects.create(name=request.POST['name'],
-                description=request.POST['description'], private=request.POST['private'])
+                description=request.POST['description'], private=request.POST.get('private', False))
             user.groups.add(group)
             user.adminOf.add(group)
             user.save()
@@ -149,6 +152,7 @@ def get_group_details(request, pk):
                 "tasks": tasks,
                 "members": members,
                 "admins": admins,
+                "points": sum([x.points for x in group.tasks.all()])
             }
             response['result'] = True
         else:
@@ -240,18 +244,20 @@ def create_new_post(request, group_pk):
         group = Group.objects.filter(pk=group_pk)
         if group:
             group = group[0]
-            try:
-                post = Post.objects.create(description=request.POST['description'])
-                post.OP.add(user)
-                post.save()
-                group.posts.add(post)
-                group.save()
-                response['result']=True
-                response['message'] = "Posted"
-                response['data'] = {"pk": post.pk}
-            except:
-                response['reason'] = "Incomplete Data"
-
+            if group in user.groups.all(): 
+                try:
+                    post = Post.objects.create(description=request.POST['description'])
+                    post.OP.add(user)
+                    post.save()
+                    group.posts.add(post)
+                    group.save()
+                    response['result']=True
+                    response['message'] = "Posted"
+                    response['data'] = {"pk": post.pk}
+                except:
+                    response['reason'] = "Incomplete Data"
+            else:
+                response['reason'] = "you are not a member of this group"
         else:
             response['reason'] = "No Group with this  PK found"
     else:
@@ -290,8 +296,8 @@ def get_post_details(request, pk):
 @csrf_exempt
 def delete_post(request, pk):
     response = {'result': False, 'reason': 'nope'}
-    import pdb
-    pdb.set_trace()
+    # import pdb
+    # pdb.set_trace()
     user = is_logged_in(request)
     if user:
         post = Post.objects.filter(pk=pk)
@@ -310,19 +316,60 @@ def delete_post(request, pk):
     return HttpResponse(json.dumps(response), content_type="application/json")
 
 @csrf_exempt
-def create_task(request, group_pk, person_pk):
+def create_task(request, group_pk):
     response = {'result': False, 'reason': 'nope'}
-    # import pdb
-    # pdb.set_trace()
+    import pdb
+    pdb.set_trace()
     user = is_logged_in(request)
+    if user:
+        group = Group.objects.filter(pk=group_pk)
+        if group:
+            group = group[0]
+            if user not in group.admins.all():
+                response['reason'] = "You're not an admin of this group"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+            try:
+                task = Task.objects.create(description=request.POST['description'],
+                        points = int(request.POST.get('points', 10)))
+                task.assigner.add(user)
+                group.tasks.add(task)
+                task.save()
+                user.save()
+                group.save()
+                response['result'] = True
+                response['message'] = "Task added"
+                response['data'] = {
+                                "pk": task.pk,
+                };
+            except:
+                response['reason'] = "Insufficent data"
+        else:
+            response['reason'] = "Group with this pk does not exist"
+    else:
+        response['reason'] = "not logged in"
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+@csrf_exempt
+def create_task_specific_to_person(request, group_pk, person_pk):
+    response = {'result': False, 'reason': 'nope'}
+    import pdb
+    pdb.set_trace()
+    user = is_logged_in(request)
+    if user.pk == int(person_pk):
+        response['reason'] = "You can't assign a task to yourself"
+        return HttpResponse(json.dumps(response), content_type="application/json")
     if user:
         group = Group.objects.filter(pk=group_pk)
         person = User.objects.filter(pk=person_pk)
         if person and group:
             person, group = person[0], group[0]
+            if user not in group.admins.all():
+                response['reason'] = "You're not an admin of this group"
+                return HttpResponse(json.dumps(response), content_type="application/json")
             if all([x in group.members.all() for x in [person, user]]):
                 try:
-                    task = Task.objects.create(description=request.POST['description'])
+                    task = Task.objects.create(description=request.POST['description'],
+                        points = int(request.POST.get('points', 10)))
                     task.assignedto.add(person)
                     task.assigner.add(user)
                     group.tasks.add(task)
@@ -348,8 +395,8 @@ def create_task(request, group_pk, person_pk):
 @csrf_exempt
 def get_task_details(request, pk):
     response = {'result': False, 'reason': 'nope'}
-    # import pdb
-    # pdb.set_trace()
+    import pdb
+    pdb.set_trace()
     user = is_logged_in(request)
     if user:
         task = Task.objects.filter(pk=pk)
@@ -363,14 +410,15 @@ def get_task_details(request, pk):
                                     "name": task.assigner.first().full_name(),
                                     "pk": task.assigner.first().pk
                                     },
-                            "assignedto": {
-                                    "name": task.assignedto.first().full_name(),
-                                    "pk": task.assignedto.first().pk
-                            },
+                            "assignedto": [{
+                                    "name": x.full_name(),
+                                    "pk": x.pk
+                            } for x in task.assignedto.all()],
                             "group": {
                                     "name": task.group.first().name,
                                     "pk": task.group.first().pk,
-                            }
+                            },
+                            "points": task.points,
             }
         else:
             response['reason'] = "Task with this pk does not exist"
@@ -394,6 +442,84 @@ def delete_task(request, pk):
                 response['message'] = "task deleted"
             else:
                 response['reason'] = "You did not start this task."
+        else:
+            response['reason'] = "Task with this pk does not exist"
+    else:
+        response['reason'] = "not logged in"
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+@csrf_exempt
+def accept_task(request, pk):
+    response = {'result': False, 'reason': 'nope'}
+    # import pdb
+    # pdb.set_trace()
+    user = is_logged_in(request)
+    if user:
+        task = Task.objects.filter(pk=pk)
+        if task:
+            task = task[0]
+            if not task.group.first() in user.groups.all():
+                response['reason'] = "You're not a part of the group that this task is of"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
+            task.assignedto.add(user)
+            task.save()
+            user.save()
+            response['result'] = True
+            response['message'] = "Added task"
+        else:
+            response['reason'] = "Task with this pk does not exist"
+    else:
+        response['reason'] = "not logged in"
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+@csrf_exempt
+def reject_task(request, pk):
+    response = {'result': False, 'reason': 'nope'}
+    # import pdb
+    # pdb.set_trace()
+    user = is_logged_in(request)
+    if user:
+        task = Task.objects.filter(pk=pk)
+        if task:
+            task = task[0]
+            if not user in task.assignedto.all():
+                response['reason'] = "You were never assigned to this task"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
+            task.assignedto.remove(user)
+            task.save()
+            user.save()
+            response['result'] = True
+            response['message'] = "Removed from task"
+        else:
+            response['reason'] = "Task with this pk does not exist"
+    else:
+        response['reason'] = "not logged in"
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+@csrf_exempt
+def complete_task(request, pk, person_pk):
+    response = {'result': False, 'reason': 'nope'}
+    # import pdb
+    # pdb.set_trace()
+    user = is_logged_in(request)
+    if user:
+        task = Task.objects.filter(pk=pk)
+        person = User.objects.filter(pk=person_pk)
+        if task and person:
+            task, person = task[0], person[0]
+            if not (user in task.assigner.all() or user in task.group.first().admins.all()):
+                response['reason'] = "You don't have permission to mark it complete"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+            if person in task.assignedto.all():
+                # TODO: mark the project completed
+                person.points += task.points
+                person.save()
+                response['result'] = True
+                response['message'] = "Done"
+            else:
+                response['reason'] = "This person was never assigned this task"
         else:
             response['reason'] = "Task with this pk does not exist"
     else:

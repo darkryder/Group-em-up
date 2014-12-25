@@ -5,6 +5,8 @@ from django.db import models
 class Task(models.Model):
 	description = models.CharField(max_length=3000, blank=False)
 	assigner = models.ManyToManyField('User', blank=False, null=True)
+	points = models.IntegerField(max_length=2, blank=False, default=10)
+	#completedBy
 
 	def isassigner(this, user):
 		return this.assigner == user
@@ -31,7 +33,7 @@ class Group(models.Model):
 	name = models.CharField(max_length=2000, blank=False)
 	description = models.CharField(max_length=4000, blank=False)
 	private = models.BooleanField(default=False)
-	joining_code = models.CharField(max_length=8, blank=False, default=generate_code(8))
+	joining_code = models.CharField(max_length=8, blank=False, default=lambda:generate_code(8))
 
 	def change_joining_code(self):
 		self.joining_code = generate_code(8)
@@ -39,6 +41,7 @@ class Group(models.Model):
 
 class Badge(models.Model):
 	name = models.CharField(max_length=32)
+	points = models.IntegerField(max_length=2, blank=False, default=10)
 
 	@staticmethod
 	def first_badge():
@@ -68,6 +71,7 @@ class Badge(models.Model):
 class User(models.Model):
 	first_name = models.CharField(max_length=128, blank=False)
 	last_name = models.CharField(max_length=128, blank=False)
+	points = models.IntegerField(max_length=2, blank=False, default=0)
 	gender = models.BooleanField(default = True) # True is female. false is male
 	groups = models.ManyToManyField(Group, related_name='members', null=True)
 	badges = models.ManyToManyField(Badge, related_name='people', null=True)
@@ -76,8 +80,8 @@ class User(models.Model):
 	posts = models.ManyToManyField(Post, related_name='OP', null=True)
 	email = models.CharField(max_length=1000, blank=False)
 
-	key1 = models.CharField(max_length=32, default=generate_code(32))
-	key2 = models.CharField(max_length=32, default=generate_code(32))
+	key1 = models.CharField(max_length=32, default=lambda: generate_code(32))
+	key2 = models.CharField(max_length=32, default=lambda: generate_code(32))
 
 	def full_name(self):
 		return ' '.join([self.first_name, self.last_name])
@@ -87,4 +91,4 @@ class User(models.Model):
 
 
 class ForgotPasswordRequest(models.Model):
-	key1 = models.CharField(max_length=32, default=generate_code(32))
+	key1 = models.CharField(max_length=32, default=lambda: generate_code(32))
