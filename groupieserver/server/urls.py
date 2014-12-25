@@ -18,10 +18,16 @@ urlpatterns = patterns('',
     url(r'^groups/new/$', views.create_group), # works
     url(r'^groups/delete/(?P<pk>\d+)/$', views.delete_group), #works
     url(r'^groups/(?P<pk>\d+)/$', views.get_group_details), # works
+
     url(r'^groups/join/(?P<pk>\d+)/$', views.join_group), # works
     url(r'^groups/leave/(?P<pk>\d+)/$', views.leave_group), # works
 
     url(r'^posts/new/(?P<group_pk>\d+)/$', views.create_new_post), # works
     url(r'^posts/(?P<pk>\d+)/$', views.get_post_details), # works
     url(r'^posts/delete/(?P<pk>\d+)/$', views.delete_post),  # works
+
+    url(r'^tasks/new/(?P<group_pk>\d+)/(?P<person_pk>\d+)/$', views.create_task), # works
+    url(r'^tasks/(?P<pk>\d+)/$', views.get_task_details),  # works
+    url(r'^tasks/delete/(?P<pk>\d+)/$', views.delete_task), # works
+
 )
