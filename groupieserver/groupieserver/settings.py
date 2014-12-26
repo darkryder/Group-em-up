@@ -66,11 +66,6 @@ WSGI_APPLICATION = 'groupieserver.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'groupiedb',                      
-        'USER': 'someuser',
-        'PASSWORD': 'pwd',
-        'HOST': 'localhost'
-    }
 }
 
 # Internationalization
