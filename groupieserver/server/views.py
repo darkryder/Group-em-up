@@ -670,3 +670,65 @@ def complete_task(request, pk, person_pk):
     else:
         response['reason'] = "not logged in"
     return HttpResponse(json.dumps(response), content_type="application/json")
+
+
+@csrf_exempt
+def global_leaderboard(request):
+    return None
+
+@csrf_exempt
+def group_leaderboard(request, pk):
+    response = {'result': False, 'reason': 'nope'}
+    # import pdb
+    # pdb.set_trace()
+    user = is_logged_in(request)
+    if user:
+        group = Group.objects.filter(pk=pk)
+        if group:
+            group = group[0]
+            answer = []
+            for member in group.members.all():
+                points = 0
+                for badge in member.badges.all():
+                    points += badge.points
+                for task in member.completedtasks.all():
+                    if group in task.group.all():
+                        points += task.points
+                answer.append({
+                    "name": member.full_name(),
+                    "pk":  member.pk,
+                    "points": member.points})
+
+            answer = sorted(answer, key=lambda k: k['points'], reverse=True)
+            answer = answer[:10]
+
+            #sort here and slice here
+            response['result'] = True
+            response['data'] = answer
+        else:
+            response['reason'] = "No Group with this  PK found"
+    else:
+        response['reason'] = "not logged in"
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+@csrf_exempt
+def global_leaderboard(request):
+    response = {'result': False, 'reason': 'nope'}
+    # import pdb
+    # pdb.set_trace()
+    user = is_logged_in(request)
+    if user:        
+        answer = []
+        for p in User.objects.order_by('-points')[:25]:
+            answer.append({
+                "name": p.full_name(),
+                "pk": p.pk,
+                "points": p.points,
+                }),
+
+        #sort here and slice here
+        response['result'] = True
+        response['data'] = answer
+    else:
+        response['reason'] = "not logged in"
+    return HttpResponse(json.dumps(response), content_type="application/json")

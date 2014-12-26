@@ -19,6 +19,10 @@ urlpatterns = patterns('',
 
     # url(r'^home/$', views.home),
 
+    url(r'^leaderboard/global/$', views.global_leaderboard),
+    url(r'^leaderboard/group/(?P<pk>\d+)/$', views.group_leaderboard),
+    
+
 
     url(r'^groups/new/$', views.create_group), # works
     url(r'^groups/delete/(?P<pk>\d+)/$', views.delete_group), #works
