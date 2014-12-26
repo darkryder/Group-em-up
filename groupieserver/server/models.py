@@ -6,9 +6,9 @@ from django.core.exceptions import ObjectDoesNotExist
 
 class Task(models.Model):
 	description = models.CharField(max_length=3000, blank=False)
-	assigner = models.ManyToManyField('User', blank=False, null=True)
+	assigner = models.ManyToManyField('User', blank=False, null=True, related_name='tasksIAssigned')
 	points = models.IntegerField(max_length=2, blank=False, default=10)
-	#completedBy
+	completedby = models.ManyToManyField('User', blank=True, null=True, related_name='completedtasks')
 
 	def isassigner(this, user):
 		return this.assigner == user
@@ -105,7 +105,7 @@ class Badge(models.Model):
 		try:
 			return Badge.objects.get(name='Starstruck')
 		except ObjectDoesNotExist:
-			badge = Badge.objects.create(name='Starstruck', points=100)
+			badge = Badge.objects.create(name='Starstruck', points=200)
 			return badge
 
 

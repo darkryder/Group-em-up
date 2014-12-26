@@ -82,8 +82,10 @@ def get_person_details(request, pk):
             person = person[0]
 
             groups = [{"name": x.name, 'pk': x.pk} for x in person.groups.all()]
-            badges = [{"name": x.name} for x in person.badges.all()]
-            tasks = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk, "description": x.description} for x in person.tasks.all()]
+            badges = [{"name": x.name, "points": x.points} for x in person.badges.all()]
+            takentasks = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk, "description": x.description} for x in person.tasks.all()]
+            tasksIAssigned = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk, "description": x.description} for x in person.tasksIAssigned.all()]
+            completedtasks = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk, "description": x.description} for x in person.completedtasks.all()]
             adminOf = [{"name": x.name, "pk": x.pk} for x in person.adminOf.all()]
             posts = [{"description": x.description} for x in person.posts.all()]
 
@@ -95,7 +97,9 @@ def get_person_details(request, pk):
                     "gender": person.gender,
                     "groups": groups,
                     "badges": badges,
-                    "tasks": tasks,
+                    "takentasks": takentasks,
+                    "tasksIAssigned": tasksIAssigned,
+                    "completedtasks": completedtasks,
                     "adminOf": adminOf,
                     "posts": posts
                 }
@@ -142,6 +146,10 @@ def get_group_details(request, pk):
             group = group[0]
             posts = [{"description": x.description, "pk": x.pk} for x in group.posts.all()]
             tasks = [{"description": x.description, "pk": x.pk} for x in group.tasks.all()]
+            for i,task in enumerate(group.tasks.all()):
+                tasks[i]['completedby'] = {"name": task.completedby.first().full_name(), "pk": tasks.completedby.first().full_name()} if \
+                                            task.completedby.all() else None
+
             members = [{"name": x.full_name(), "pk": x.pk} for x in group.members.all()]
             admins = [{"name": x.full_name(), "pk": x.pk} for x in group.admins.all()]
             response['data'] = {
@@ -191,8 +199,8 @@ def delete_group(request, pk):
 @csrf_exempt
 def join_group(request, pk):
     response = {'result': False, 'reason': 'nope'}
-    import pdb
-    pdb.set_trace()
+    # import pdb
+    # pdb.set_trace()
     user = is_logged_in(request)
     if user:
         group = Group.objects.filter(pk=pk)
@@ -231,13 +239,15 @@ def leave_group(request, pk):
     # import pdb
     # pdb.set_trace()
 
-    #TODO
-    # don't allow admins to leave groups
     user = is_logged_in(request)
     if user:
         group = Group.objects.filter(pk=pk)
         if group:
             group = group[0]
+            if user in group.admins.all():
+                request['reason'] = "You are an admin. You can't exit the group"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
             if user in group.members.all():
                 group.members.remove(user)
                 group.save()
@@ -411,7 +421,7 @@ def delete_post(request, pk):
         post = Post.objects.filter(pk=pk)
         if post:
             post = post[0]
-            if (user in post.OP.all()) or (user in post.group.first().admins.all()):
+            if (user in post.group.first().admins.all()) or (user in post.OP.all()):
                 response['result'] = True
                 response['message'] = "Deleted"
                 post.delete()
@@ -426,17 +436,21 @@ def delete_post(request, pk):
 @csrf_exempt
 def create_task(request, group_pk):
     response = {'result': False, 'reason': 'nope'}
-    import pdb
-    pdb.set_trace()
+    # import pdb
+    # pdb.set_trace()
     user = is_logged_in(request)
     if user:
         group = Group.objects.filter(pk=group_pk)
         if group:
             group = group[0]
-            # if user not in group.admins.all():
-            #     response['reason'] = "You're not an admin of this group"
-            #     return HttpResponse(json.dumps(response), content_type="application/json")
+            if user not in group.admins.all():
+                response['reason'] = "You're not an admin of this group"
+                return HttpResponse(json.dumps(response), content_type="application/json")
             try:
+                if 0 > int(request.POST.get('points', 1)) < 100:
+                    response['reason'] = "You must allot between 0 and 100 points"
+                    return HttpResponse(json.dumps(response), content_type="application/json")    
+
                 task = Task.objects.create(description=request.POST['description'],
                         points = int(request.POST.get('points', 10)))
                 task.assigner.add(user)
@@ -460,8 +474,8 @@ def create_task(request, group_pk):
 @csrf_exempt
 def create_task_specific_to_person(request, group_pk, person_pk):
     response = {'result': False, 'reason': 'nope'}
-    import pdb
-    pdb.set_trace()
+    # import pdb
+    # pdb.set_trace()
     user = is_logged_in(request)
     if user.pk == int(person_pk):
         response['reason'] = "You can't assign a task to yourself"
@@ -471,9 +485,9 @@ def create_task_specific_to_person(request, group_pk, person_pk):
         person = User.objects.filter(pk=person_pk)
         if person and group:
             person, group = person[0], group[0]
-            # if user not in group.admins.all():
-            #     response['reason'] = "You're not an admin of this group"
-            #     return HttpResponse(json.dumps(response), content_type="application/json")
+            if user not in group.admins.all():
+                response['reason'] = "You're not an admin of this group"
+                return HttpResponse(json.dumps(response), content_type="application/json")
             if all([x in group.members.all() for x in [person, user]]):
                 try:
                     task = Task.objects.create(description=request.POST['description'],
@@ -503,8 +517,8 @@ def create_task_specific_to_person(request, group_pk, person_pk):
 @csrf_exempt
 def get_task_details(request, pk):
     response = {'result': False, 'reason': 'nope'}
-    import pdb
-    pdb.set_trace()
+    # import pdb
+    # pdb.set_trace()
     user = is_logged_in(request)
     if user:
         task = Task.objects.filter(pk=pk)
@@ -528,6 +542,8 @@ def get_task_details(request, pk):
                             },
                             "points": task.points,
             }
+            response['data']['completedby'] = {"name": task.completedby.first().full_name(), "pk": task.completedby.first().pk} if \
+                                                task.completedby.all() else None
         else:
             response['reason'] = "Task with this pk does not exist"
     else:
@@ -545,9 +561,12 @@ def delete_task(request, pk):
         if task:
             task = task[0]
             if (user in task.assigner.all()) or (user in task.group.first().admins.all()):
+                for x in task.completedby.all():
+                    x.points -= task.points
+                    x.save()
+
                 task.delete()
-                #TODO
-                # remove points from the person who's completed it
+
                 response['result']= True
                 response['message'] = "task deleted"
             else:
@@ -623,7 +642,8 @@ def complete_task(request, pk, person_pk):
                 response['reason'] = "You don't have permission to mark it complete"
                 return HttpResponse(json.dumps(response), content_type="application/json")
             if person in task.assignedto.all():
-                # TODO: mark the project completed
+                task.completedby.add(person)
+                task.save()
                 person.points += task.points
                 person.save()
                 response['result'] = True
@@ -636,8 +656,13 @@ def complete_task(request, pk, person_pk):
                     person.save()
                     badge.save()
 
-                #TODO 
-                #badge on completing 10 tasks
+                if person.completedtasks.count() > 10:
+                    badge = Badge.get_dependable_badge()
+                    if badge not in person.badges.all():
+                        person.badges.add(badge)
+                        person.points += badge.points
+                        person.save()
+                        badge.save()
             else:
                 response['reason'] = "This person was never assigned this task"
         else:
