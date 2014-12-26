@@ -30,7 +30,7 @@ urlpatterns = patterns('',
 
     url(r'^groups/join/(?P<pk>\d+)/$', views.join_group), # works
     url(r'^groups/leave/(?P<pk>\d+)/$', views.leave_group), # works
-    url(r'^groups/code/change/?P<pk>\d+)/$', views.change_joining_code),
+    url(r'^groups/code/change/(?P<pk>\d+)/$', views.change_joining_code),
 
     url(r'^groups/assignadmin/(?P<group_pk>\d+)/(?P<person_pk>\d+)/$', views.assign_admin), # works
     url(r'^groups/removeadmin/(?P<group_pk>\d+)/(?P<person_pk>\d+)/$', views.remove_admin), # works
