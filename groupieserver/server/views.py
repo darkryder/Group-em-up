@@ -671,11 +671,6 @@ def complete_task(request, pk, person_pk):
         response['reason'] = "not logged in"
     return HttpResponse(json.dumps(response), content_type="application/json")
 
-
-@csrf_exempt
-def global_leaderboard(request):
-    return None
-
 @csrf_exempt
 def group_leaderboard(request, pk):
     response = {'result': False, 'reason': 'nope'}
