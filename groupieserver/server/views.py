@@ -727,3 +727,24 @@ def global_leaderboard(request):
     else:
         response['reason'] = "not logged in"
     return HttpResponse(json.dumps(response), content_type="application/json")
+
+@csrf_exempt
+def change_joining_code(request, pk):
+    response = {'result': False, 'reason': 'nope'}
+    # import pdb
+    # pdb.set_trace()
+    user = is_logged_in(request)
+    if user:
+        group = Group.objects.filter(pk=pk)
+        if group:
+            group = group[0]
+            group.change_joining_code()
+            response['result'] = True
+            response['data'] = {
+                        "code": group.joining_code,
+            }
+        else:
+            response['reason'] = "No Group with this  PK found"
+    else:
+        response['reason'] = "not logged in"
+    return HttpResponse(json.dumps(response), content_type="application/json")
