@@ -738,6 +738,9 @@ def change_joining_code(request, pk):
         group = Group.objects.filter(pk=pk)
         if group:
             group = group[0]
+            if user not in group.admins.all():
+                response['reason'] = "You're not an admin"
+                return HttpResponse(json.dumps(response), content_type="application/json")
             group.change_joining_code()
             response['result'] = True
             response['data'] = {
