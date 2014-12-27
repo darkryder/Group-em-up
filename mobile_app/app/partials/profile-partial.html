@@ -1,8 +1,73 @@
-This is the profile page
-Go to <a href="#/home/">Home</a>
-<br /> 
-<b>Details</b>
+<h1>Profile</h1>
 
-Name:  {{ person.name }}<br />
-Email:  {{ person.email }}<br />
-Gender:  {{ person.gender }}<br />
+
+First Name:  {{ bucket.person.first_name }} <br />
+Last Name:  {{ bucket.person.last_name }}<br />
+Email:  {{ bucket.person.email }}<br />
+Gender:  {{ bucket.person.gender }}<br />
+Points: {{ bucket.person.points }} <br />
+
+Gender: <span ng-if="bucket.person.gender === true">Female</span><span ng-if="bucket.person.gender === false">Male</span> <br />
+
+Groups:<span ng-if="bucket.person.adminOf.length == 0">Not an admin of any group</span> <br />
+<span ng-if="bucket.person.adminOf.length != 0">
+ 	<ul>
+		<li ng-repeat="group in bucket.person.groups">
+			{{ group }}
+		</li>
+	</ul>
+</span>
+
+Admin of Groups: <span ng-if="bucket.person.adminOf.length == 0">Not an admin of any group</span> <br />
+<span ng-if="bucket.person.adminOf.length != 0">
+	<ul>
+		<li ng-repeat="group in $parent.bucket.person.adminOf">
+			{{ group }}
+		</li>
+	</ul>
+</span>
+
+Posts: <span ng-if="bucket.person.posts.length == 0">Not posted anything yet</span> <br />
+<span ng-if="bucket.person.posts.length != 0">
+	<ul>
+		<li ng-repeat="post in $parent.bucket.person.posts">
+			{{ post }}
+		</li>
+	</ul>
+</span>
+
+Tasks Assigned: <span ng-if="bucket.person.tasksIAssigned.length == 0">No tasks assigned yet</span> <br />
+<span ng-if="bucket.person.tasksIAssigned.length != 0">
+	<ul>
+		<li ng-repeat="task in $parent.bucket.person.tasksIAssigned">
+			{{ task }}
+		</li>
+	</ul>
+</span>
+
+Tasks taken: <span ng-if="bucket.person.takentasks.length == 0">No tasks taken yet</span> <br />
+<span ng-if="bucket.person.takentasks.length != 0">
+	<ul>
+		<li ng-repeat="task in $parent.bucket.person.takentasks">
+			{{ task }}
+		</li>
+	</ul>
+</span>
+
+Tasks Completed: <span ng-if="bucket.person.completedtasks.length == 0">No tasks completed yet</span> <br />
+<span ng-if="bucket.person.completedtasks.length != 0">
+	<ul>
+		<li ng-repeat="task in $parent.bucket.person.completedtasks">
+			{{ task }}
+		</li>
+	</ul>
+</span>
+
+Badges: <span ng-if="bucket.person.badges.length == 0">No badges yet</span> <br />
+<span ng-if="bucket.person.badges.length != 0">
+	<ul>
+		<li ng-repeat="badge in $parent.bucket.person.badges">
+			{{ badge }}
+		</li>
+	</ul>
+</span>

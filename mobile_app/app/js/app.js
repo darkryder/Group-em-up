@@ -6,6 +6,12 @@ var groupieApp = angular.module('groupieApp',[
 	'ngRoute',
 	'groupieAppControllers']);
 
+/* Routes are defined herein
+ * Difficult battles with trainers ensue
+ * Proceed with caution. 
+ * This is the only part you are allowed to touch
+ */
+
 groupieApp.config(['$routeProvider',
 	function($routeProvider){
 		$routeProvider.
@@ -17,18 +23,30 @@ groupieApp.config(['$routeProvider',
 				templateUrl: 'partials/profile-partial.html',
 				controller: 'profilePageController'
 			}).
+			when('/signup/', {
+				templateUrl: 'partials/signup-partial.html',
+				controller: 'signupController'
+			}).
 			otherwise({
 				redirectTo: '/home/'
 			});
 	}]);
 
+/* You may not proceed further into the forbidden forest harry,
+ * except with Hagrid, then god bless you, you've got a dim witted giant for support
+ */
+
+/* Magic shit which enables 
+ * sending Cross Domain Post Requests with JSON
+ * Don't touch. Just be grateful and pray.
+ */ 
 groupieApp.config(['$httpProvider', function($httpProvider) {
 		$httpProvider.defaults.headers.common['Content-Type'] = 'application/json; charset=utf-8';
 		$httpProvider.defaults.useXDomain = true;
         delete $httpProvider.defaults.headers.common['X-Requested-With'];
 
         /**
-		* Stolen shamelessly from http://stackoverflow.com/a/20276775/2851353 with loads of thanks
+		* All code below this has been stolen shamelessly from http://stackoverflow.com/a/20276775/2851353 with loads of thanks
         */
         $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 
