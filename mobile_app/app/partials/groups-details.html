@@ -8,7 +8,7 @@ Members:<span ng-if="bucket.group.members.length == 0">This group is empty</span
 <span ng-if="bucket.group.members.length != 0">
  	<ul>
 		<li ng-repeat="member in $parent.bucket.group.members">
-			{{ member }}
+			<a href="#/person/{{member.pk}}">{{ member.name }}</a>
 		</li>
 	</ul>
 </span>
@@ -17,16 +17,17 @@ Admins of Group: <span ng-if="bucket.group.admins.length == 0">This group has no
 <span ng-if="bucket.group.admins.length != 0">
 	<ul>
 		<li ng-repeat="admin in $parent.bucket.group.admins">
-			{{ admin }}
+			<a href="#/person/{{admin.pk}}">{{ admin.name }}</a>
 		</li>
 	</ul>
 </span>
 
+<span ng-if="bucket.group.name !== ''"> <a href="#/posts/new/{{bucket.group.pk}}/">Add a new post </a></span><br />
 Posts: <span ng-if="bucket.group.posts.length == 0">No posts yet</span> <br />
 <span ng-if="bucket.group.posts.length != 0">
 	<ul>
 		<li ng-repeat="post in $parent.bucket.group.posts">
-			{{ post }}
+			{{ post.description }}
 		</li>
 	</ul>
 </span>

@@ -23,17 +23,25 @@ groupieApp.config(['$routeProvider',
 				templateUrl: 'partials/profile-partial.html',
 				controller: 'profilePageController'
 			}).
+			when('/person/:person_pk', {
+				templateUrl: 'partials/person-details.html',
+				controller: 'personSpecificViewController'
+			}).
 			when('/signup/', {
 				templateUrl: 'partials/signup-partial.html',
 				controller: 'signupController'
 			}).
-			when('/groups/:group_pk/', {
-				templateUrl: 'partials/groups-details.html',
-				controller: 'groupSpecificView'
-			}).
 			when('/groups/new/', {
 				templateUrl: 'partials/groups-new.html',
 				controller: 'groupsNewController'
+			}).
+			when('/groups/:group_pk/', {
+				templateUrl: 'partials/groups-details.html',
+				controller: 'groupSpecificViewController'
+			}).
+			when('/posts/new/:group_pk/', {
+				templateUrl: 'partials/posts-new.html',
+				controller: 'postsNewController'
 			}).
 			otherwise({
 				redirectTo: '/home/'

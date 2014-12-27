@@ -234,6 +234,49 @@ groupieAppControllers.controller('profilePageController', ['$scope', '$http', '$
 		}
 	}]);
 
+
+/* View specif person details controller
+ * If user is not logged in, it is redirected to signup page, which has the option of password reset too
+ * It either gets the prefetched cached data or fetches the profile data
+ * from the server and displays it to the user
+ * As of now, it gets all the data from the api
+ * TODO: = cache data
+ * It's basically the same logic as profile
+ */
+groupieAppControllers.controller('personSpecificViewController', ['$scope', '$http', '$location', '$routeParams',
+	function($scope, $http, $location, $routeParams){
+		$scope.bucket = {person: commonFunctions.get_empty_person_object()};
+
+		if (!commonFunctions.is_logged_in()){
+			console.log("not logged in");
+			$location.path("signup/");
+		}
+		else{
+			var auth_data = commonFunctions.get_auth_data();
+			var person_pk = $routeParams.person_pk;
+
+			commonFunctions.show_server_contact_attempt();
+			
+			// TODO remove fetch details to use get_self_details after caching output
+			commonFunctions.fetch_person_details($http, person_pk).
+			success(function(data){
+				commonFunctions.hide_server_contact();
+				if (commonFunctions.api_call_successfull(data)){
+					$scope.bucket.person = data.data;
+					console.log("fetched self details:" + JSON.stringify($scope.bucket.person));
+				}else{
+					commonFunctions.show_server_contact_failed();
+					console.log("API call unsuccessful. " + JSON.stringify(data.reason));
+				}
+			}).
+			error(function(status, data){
+				commonFunctions.show_server_contact_failed();
+				console.log("failed");
+			});
+		}
+	}])
+
+
 /* Signup controller.
  * If person is already signed up, he should never be shown this page,
  * However if he is, by some mistake, he would be redirected back to home
@@ -341,7 +384,11 @@ groupieAppControllers.controller('groupsNewController', ['$scope', '$location', 
 		}
 	}]);
 
-groupieAppControllers.controller('groupSpecificView', ['$scope', '$http', '$location', '$routeParams',
+/* View specific group
+ * Fetches / gets the data of the specifed group.
+ * Shows all the details.
+ */
+groupieAppControllers.controller('groupSpecificViewController', ['$scope', '$http', '$location', '$routeParams',
 	function($scope, $http, $location, $routeParams){
 
 		if (!commonFunctions.is_logged_in()){
@@ -371,3 +418,41 @@ groupieAppControllers.controller('groupSpecificView', ['$scope', '$http', '$loca
 				});
 		}
 	}]);
+
+
+/* Create a new post controller
+ * creates a new post within the group specified.
+ */
+ groupieAppControllers.controller('postsNewController', ['$scope', '$location', '$http', '$routeParams',
+ 	function($scope, $location, $http, $routeParams){
+ 		if (!commonFunctions.is_logged_in()){
+			console.log("not logged in");
+			$location.path("signup/");
+		} else {
+			$scope.description = "";
+			$scope.create_post = function(){
+				var group_pk = $routeParams.group_pk;
+				var link = commonFunctions.get_api_link();
+				var data = commonFunctions.get_auth_data();
+				data['description'] = $scope.description;
+
+				commonFunctions.show_server_contact_attempt();
+				$http.post(link + 'posts/new/' + group_pk + '/', data).
+					success(function(data){
+						if (commonFunctions.api_call_successfull(data)){
+							commonFunctions.hide_server_contact();
+							console.log("DONE: " + JSON.stringify(data));
+						} else{
+							commonFunctions.show_server_contact_failed();
+							console.log("API call: response from server. result false");
+							console.log("RESPONSE: " + JSON.stringify(data));
+						}
+					}).
+					error(function(data, status){
+						console.log("error data " + data);
+						console.log("error status " + status);
+						commonFunctions.show_server_contact_failed();
+					})
+			}	
+		}
+ 	}]);
