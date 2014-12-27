@@ -27,6 +27,10 @@ groupieApp.config(['$routeProvider',
 				templateUrl: 'partials/signup-partial.html',
 				controller: 'signupController'
 			}).
+			when('/groups/:group_pk/', {
+				templateUrl: 'partials/groups-details.html',
+				controller: 'groupSpecificView'
+			}).
 			when('/groups/new/', {
 				templateUrl: 'partials/groups-new.html',
 				controller: 'groupsNewController'

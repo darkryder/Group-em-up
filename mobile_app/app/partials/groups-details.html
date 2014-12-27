@@ -1,0 +1,41 @@
+<h1>Group Details</h1>
+
+Name:  {{ bucket.group.name }} <br />
+Description:  {{ bucket.group.description }}<br />
+Points:  {{ bucket.group.points }}<br />
+
+Members:<span ng-if="bucket.group.members.length == 0">This group is empty</span> <br />
+<span ng-if="bucket.group.members.length != 0">
+ 	<ul>
+		<li ng-repeat="member in $parent.bucket.group.members">
+			{{ member }}
+		</li>
+	</ul>
+</span>
+
+Admins of Group: <span ng-if="bucket.group.admins.length == 0">This group has no admin</span> <br />
+<span ng-if="bucket.group.admins.length != 0">
+	<ul>
+		<li ng-repeat="admin in $parent.bucket.group.admins">
+			{{ admin }}
+		</li>
+	</ul>
+</span>
+
+Posts: <span ng-if="bucket.group.posts.length == 0">No posts yet</span> <br />
+<span ng-if="bucket.group.posts.length != 0">
+	<ul>
+		<li ng-repeat="post in $parent.bucket.group.posts">
+			{{ post }}
+		</li>
+	</ul>
+</span>
+
+Tasks: <span ng-if="bucket.group.tasks.length == 0">No tasks started yet</span> <br />
+<span ng-if="bucket.group.tasks.length != 0">
+	<ul>
+		<li ng-repeat="task in $parent.bucket.group.tasks">
+			{{ task }}
+		</li>
+	</ul>
+</span>

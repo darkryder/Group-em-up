@@ -66,6 +66,13 @@ var commonFunctions = {
 		};
 	},
 
+	get_empty_group_object: function(){
+		return {
+			name: "", description: "", pk: null, points: null,
+			members: [], tasks: [], admins: [], posts: []
+		}
+	},
+
 	// gets whatever the storage medium be
 	get_storage: function(){
 		return _hiddenCommonData.storage;
@@ -332,4 +339,35 @@ groupieAppControllers.controller('groupsNewController', ['$scope', '$location', 
 					});
 			}
 		}
-	}])
+	}]);
+
+groupieAppControllers.controller('groupSpecificView', ['$scope', '$http', '$location', '$routeParams',
+	function($scope, $http, $location, $routeParams){
+
+		if (!commonFunctions.is_logged_in()){
+			console.log("not logged in");
+			$location.path("signup/");
+		} else {
+			$scope.bucket = {group: commonFunctions.get_empty_group_object()};
+			var group_pk = $routeParams.group_pk;
+
+			commonFunctions.show_server_contact_attempt();
+			commonFunctions.fetch_group_details($http, group_pk).
+				success(function(data){
+					if (commonFunctions.api_call_successfull(data)){
+						commonFunctions.hide_server_contact();
+						$scope.bucket.group = data.data;
+						console.log("FETCHED: " + JSON.stringify(data));
+					} else{
+						commonFunctions.show_server_contact_failed();
+						console.log("API call: response from server. result false");
+						console.log("RESPONSE: " + JSON.stringify(data));
+					}
+				}).
+				error(function(data, status){
+					console.log("error data " + data);
+					console.log("error status " + status);
+					commonFunctions.show_server_contact_failed();
+				});
+		}
+	}]);
