@@ -27,6 +27,10 @@ groupieApp.config(['$routeProvider',
 				templateUrl: 'partials/signup-partial.html',
 				controller: 'signupController'
 			}).
+			when('/groups/new/', {
+				templateUrl: 'partials/groups-new.html',
+				controller: 'groupsNewController'
+			}).
 			otherwise({
 				redirectTo: '/home/'
 			});

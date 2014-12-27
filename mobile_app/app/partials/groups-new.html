@@ -1,0 +1,9 @@
+<h1> Create a new group </h1>
+
+Name: <input type="text" ng-model="group_name" /><br />
+
+Description: <input type="text" ng-model="group_description" /><br />
+
+Visibility: <select ng-model="group_visibility"><option value="private">Private</option><option value="public">Public</option></select><br />
+
+<input type="submit" value="Create Group" ng-click="create_group()">

@@ -39,7 +39,7 @@ var commonFunctions = {
 		$("#server-connection-spinner-success").hide();
 		$("#server-connection-spinner-fail").show()
 
-		setTimeout(function(){commonFunctions.hide_server_contact();}, 1000 * 3)
+		setTimeout(function(){commonFunctions.hide_server_contact();}, 1000 * 5)
 	},
 
 	hide_server_contact: function(){
@@ -47,6 +47,10 @@ var commonFunctions = {
 		$("#server-connection-spinner-white").hide();
 		$("#server-connection-spinner-success").hide();
 		$("#server-connection-spinner-fail").hide()
+	},
+
+	test_server_connection: function(http){
+		return http.get(_hiddenCommonData.api_link + 'test/');
 	},
 
 	// sees if call was successfull
@@ -65,6 +69,10 @@ var commonFunctions = {
 	// gets whatever the storage medium be
 	get_storage: function(){
 		return _hiddenCommonData.storage;
+	},
+
+	get_api_link: function(){
+		return _hiddenCommonData.api_link;
 	},
 
 	// tells whether the person is logged in
@@ -114,22 +122,26 @@ var commonFunctions = {
 	// this follows builder pattern. It will return 
 	// the implemented jqeury $.post
 	fetch_self_details: function(http){
-		return this.get_person_details(http, this.get_auth_data['pk']);
+		return this.fetch_person_details(http, this.get_auth_data['pk']);
 	},
 
 	// this follows builder pattern. It will return 
 	// the implemented jqeury $.post
-	get_person_details: function(http, who_pk){
+	fetch_person_details: function(http, who_pk){
 		var auth_data = this.get_auth_data();
 		var self_pk = auth_data['pk']
 		return http.post(_hiddenCommonData.api_link + 'person/' + self_pk +'/', auth_data);
+	},
+
+	get_person_details: function(who_pk){
+
 	},
 
 	set_person_details: function(who_pk, data_from_server){
 
 	},
 
-	get_group_details: function(http, which_pk){
+	fetch_group_details: function(http, which_pk){
 		var auth_data = this.get_auth_data();
 		return http.post(_hiddenCommonData.api_link + 'groups/' + which_pk + '/', auth_data);
 	},
@@ -274,3 +286,50 @@ groupieAppControllers.controller('signupController', ['$scope', '$http', '$locat
 			});
 		}
 	}]);
+
+/* Allows creating new groups
+ * If not logged in, redirects to signup page.
+ * TODO: save group data in storage
+ */
+groupieAppControllers.controller('groupsNewController', ['$scope', '$location', '$http',
+	function($scope, $location, $http){
+
+		if (!commonFunctions.is_logged_in()){
+			console.log("not logged in");
+			$location.path("signup/");
+		}
+		else {
+			$scope.group_name = "";
+			$scope.group_description = "";
+			$scope.group_visibility = "public";
+
+			$scope.create_group = function(){
+				var link = commonFunctions.get_api_link();
+				var data = commonFunctions.get_auth_data();
+				data['name'] = $scope.group_name;
+				data['description'] = $scope.group_description;
+				data['private'] = ($scope.group_visibility === 'private' ? true: false);
+
+				console.log("Sending data: " + JSON.stringify(data));
+				commonFunctions.show_server_contact_attempt();
+
+				$http.post(link + 'groups/new/', data).
+					success(function(data){
+						if (commonFunctions.api_call_successfull(data)){
+							commonFunctions.hide_server_contact();
+							console.log("new group created");
+							console.log(JSON.stringify(data));
+						} else {
+							commonFunctions.show_server_contact_failed();
+							console.log("API call: response from server. result false");
+							console.log("RESPONSE: " + JSON.stringify(data));
+						}
+					}).
+					error(function(data, status){
+						console.log("error data " + data);
+						console.log("error status " + status);
+						commonFunctions.show_server_contact_failed();
+					});
+			}
+		}
+	}])
