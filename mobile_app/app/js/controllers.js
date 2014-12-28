@@ -129,15 +129,14 @@ var commonFunctions = {
 	// this follows builder pattern. It will return 
 	// the implemented jqeury $.post
 	fetch_self_details: function(http){
-		return this.fetch_person_details(http, this.get_auth_data['pk']);
+		return this.fetch_person_details(http, this.get_auth_data()['pk']);
 	},
 
 	// this follows builder pattern. It will return 
 	// the implemented jqeury $.post
 	fetch_person_details: function(http, who_pk){
 		var auth_data = this.get_auth_data();
-		var self_pk = auth_data['pk']
-		return http.post(_hiddenCommonData.api_link + 'person/' + self_pk +'/', auth_data);
+		return http.post(_hiddenCommonData.api_link + 'person/' + who_pk +'/', auth_data);
 	},
 
 	get_person_details: function(who_pk){
