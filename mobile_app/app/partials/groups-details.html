@@ -32,6 +32,7 @@ Posts: <span ng-if="bucket.group.posts.length == 0">No posts yet</span> <br />
 	</ul>
 </span>
 
+<span ng-if="bucket.group.name !== ''"> <a href="#/tasks/new/{{bucket.group.pk}}/">Add a new task </a></span><br />
 Tasks: <span ng-if="bucket.group.tasks.length == 0">No tasks started yet</span> <br />
 <span ng-if="bucket.group.tasks.length != 0">
 	<ul>

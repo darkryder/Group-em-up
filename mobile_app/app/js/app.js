@@ -43,6 +43,10 @@ groupieApp.config(['$routeProvider',
 				templateUrl: 'partials/posts-new.html',
 				controller: 'postsNewController'
 			}).
+			when('/tasks/new/:group_pk', {
+				templateUrl: 'partials/tasks-new.html',
+				controller: 'tasksNewController'
+			}).
 			otherwise({
 				redirectTo: '/home/'
 			});

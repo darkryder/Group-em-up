@@ -1,0 +1,13 @@
+<h1> Assign a new task </h1>
+
+Task details: <input type="text" ng-model="description" /><br />
+Points: <input type="text" ng-model="points" /><br />
+Originally assign to: 
+<select ng-model="assignee">
+	<option value="">Anyone can join</option>
+	<optgroup ng-repeat="member in bucket.group.members">
+		<option value="{{ member.pk }}"> {{ member.name }} </option>
+	</optgroup>
+</select>
+<br />
+<input type="submit" value="Create Task" ng-click="create_task()">
