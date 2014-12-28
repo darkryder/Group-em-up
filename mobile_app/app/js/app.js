@@ -112,3 +112,15 @@ groupieApp.config(['$httpProvider', function($httpProvider) {
 		}];
     }
 ]);
+
+/* Removes the unsafe extension from app: protocal
+ * see here http://stackoverflow.com/a/15769779/2851353
+ */
+groupieApp.config( [
+    '$compileProvider',
+    function( $compileProvider )
+    {   
+        $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension|app):/);
+        // Angular before v1.2 uses $compileProvider.urlSanitizationWhitelist(...)
+    }
+]);

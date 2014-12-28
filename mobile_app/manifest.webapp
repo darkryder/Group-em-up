@@ -1,0 +1,36 @@
+{
+  "version": "0.0 dev.",
+  "name": "Groupie",
+  "description": "Get work done, in a more fun, collaborative way",
+  "launch_path": "/app/index.html",
+  "icons": {
+    "16": "/app/img/icon-16.png",
+    "48": "/app/img/icon-48.png",
+    "128": "/app/img/icon-128.png"
+  },
+  "type": "privileged",
+  "permissions": {
+    "systemXHR": {
+      "description": "Required to load remote content"
+    }
+  },
+  "developer": {
+    "name": "Sambhav Satija",
+    "url": "https://github.com/darkryder"
+  },
+  "locales": {
+    "es": {
+      "description": "Su nueva aplicación impresionante Open Web",
+      "developer": {
+        "url": "http://yourawesomeapp.com"
+      }
+    },
+    "it": {
+      "description": "La tua nuova fantastica Open Web App",
+      "developer": {
+        "url": "http://yourawesomeapp.com"
+      }
+    }
+  },
+  "default_locale": "en"
+}
