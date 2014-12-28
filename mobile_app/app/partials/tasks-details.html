@@ -1,0 +1,13 @@
+<h1>Task Details</h1>
+
+Description: {{ bucket.task.description  }}<br />
+Points: {{ bucket.task.points }}<br />
+Group : <a href="#/tasks/{{ bucket.task.group.pk }}/">{{ bucket.task.group.name }}</a><br />
+Assigner: <a href="#/person/{{ bucket.task.assigner.pk}}">{{ bucket.task.assigner.name }}</a><br />
+Assigend To:
+	<ul>
+		<li ng-repeat="p in bucket.task.assignedto">
+			<a href="#/person/{{p.pk}}/">{{ p.name }}</a>
+		</li>
+	</ul>
+Completed By: {{ bucket.task.completedby }} <br />

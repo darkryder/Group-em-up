@@ -39,7 +39,7 @@ Tasks Assigned: <span ng-if="bucket.person.tasksIAssigned.length == 0">No tasks 
 <span ng-if="bucket.person.tasksIAssigned.length != 0">
 	<ul>
 		<li ng-repeat="task in $parent.bucket.person.tasksIAssigned">
-			{{ task }}
+			<a href="#/tasks/{{task.pk}}/"><strong>{{task.group.name}}: </strong>{{ task.description }}</a>
 		</li>
 	</ul>
 </span>
@@ -48,7 +48,7 @@ Tasks taken: <span ng-if="bucket.person.takentasks.length == 0">No tasks taken y
 <span ng-if="bucket.person.takentasks.length != 0">
 	<ul>
 		<li ng-repeat="task in $parent.bucket.person.takentasks">
-			{{ task }}
+			<a href="#/tasks/{{task.pk}}/"><strong>{{task.group.name}}: </strong>{{ task.description }}</a>
 		</li>
 	</ul>
 </span>
@@ -57,7 +57,7 @@ Tasks Completed: <span ng-if="bucket.person.completedtasks.length == 0">No tasks
 <span ng-if="bucket.person.completedtasks.length != 0">
 	<ul>
 		<li ng-repeat="task in $parent.bucket.person.completedtasks">
-			{{ task }}
+			<a href="#/tasks/{{task.pk}}/"><strong>{{task.group.name}}: </strong>{{ task.description }}</a>
 		</li>
 	</ul>
 </span>

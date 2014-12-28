@@ -73,6 +73,13 @@ var commonFunctions = {
 		}
 	},
 
+	get_empty_task_object: function(){
+		return {
+			pk: null, group:null, description: '', points: null,
+			completedby: null, assigner: null, assignedto: [],
+		};
+	},
+
 	// gets whatever the storage medium be
 	get_storage: function(){
 		return _hiddenCommonData.storage;
@@ -154,6 +161,11 @@ var commonFunctions = {
 
 	set_group_details: function(which, data_from_server){
 
+	},
+
+	fetch_task_details: function(http, task_pk){
+		var auth_data = this.get_auth_data();
+		return http.post(_hiddenCommonData.api_link + 'tasks/' + task_pk + '/', auth_data);
 	},
 }
 
@@ -521,4 +533,35 @@ groupieAppControllers.controller('groupSpecificViewController', ['$scope', '$htt
 					});
 			}
 		}
- 	}])
+ 	}]);
+
+groupieAppControllers.controller('taskSpecificViewController', ['$scope', '$location', '$routeParams', '$http', 
+	function($scope, $location, $routeParams, $http){
+		if (!commonFunctions.is_logged_in()){
+			console.log("not logged in");
+			$location.path("signup/");
+		} else {
+			var task_pk = $routeParams.task_pk;
+
+			$scope.bucket = {task: commonFunctions.get_empty_task_object()};
+
+			commonFunctions.show_server_contact_attempt()
+			commonFunctions.fetch_task_details($http, task_pk).
+				success(function(data){
+					if (commonFunctions.api_call_successfull(data)){
+						commonFunctions.hide_server_contact();
+						$scope.bucket.task = data.data;
+						console.log("DONE: " + JSON.stringify(data));
+					} else{
+						commonFunctions.show_server_contact_failed();
+						console.log("API call: response from server. result false");
+						console.log("RESPONSE: " + JSON.stringify(data));
+					}
+				}).
+				error(function(data, status){
+					console.log("error data " + data);
+					console.log("error status " + status);
+					commonFunctions.show_server_contact_failed();
+				});
+		}
+	}])

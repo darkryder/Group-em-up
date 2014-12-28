@@ -8,12 +8,6 @@
     "48": "/app/img/icon-48.png",
     "128": "/app/img/icon-128.png"
   },
-  "type": "privileged",
-  "permissions": {
-    "systemXHR": {
-      "description": "Required to load remote content"
-    }
-  },
   "developer": {
     "name": "Sambhav Satija",
     "url": "https://github.com/darkryder"
