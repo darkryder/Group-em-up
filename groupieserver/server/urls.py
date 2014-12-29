@@ -51,4 +51,9 @@ urlpatterns = patterns('',
     url(r'^tasks/reject/(?P<pk>\d+)/$', views.reject_task), # works
     url(r'^tasks/complete/(?P<pk>\d+)/(?P<person_pk>\d+)/$', views.complete_task), # works
 
+
+    url(r'^forgotpassword/takecode/$', views.take_forgot_password_code),
+    url(r'^forgotpassword/givecode/$', views.give_forgot_password_code),
+    
+    #check privacy
 )

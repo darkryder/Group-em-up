@@ -3,9 +3,7 @@ from models import User, Group, Task, Post, Badge, ForgotPasswordRequest
 import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
-# Create your views here.
-# return HttpResponse(json.dumps(response), content_type="application/json")
+from django.core.mail import send_mail
 
 @csrf_exempt
 def is_logged_in(request):
@@ -46,7 +44,7 @@ def signup(request):
 
         email = request.POST.get('email', '')
         if User.objects.filter(email=email):
-            response['reason'] = "Email exists"
+            response['reason'] = "Email already exists."
             return HttpResponse(json.dumps(response), content_type="application/json")
 
         # import pdb
@@ -54,7 +52,7 @@ def signup(request):
         try:
             user = User.objects.create(first_name=request.POST['first_name'],
                                 last_name = request.POST['last_name'],
-                                gender = request.POST['gender'],
+                                gender = json.loads(request.POST['gender']),
                                 email = request.POST['email'])
 
             response['result'] = True
@@ -81,13 +79,13 @@ def get_person_details(request, pk):
         if person:
             person = person[0]
 
-            groups = [{"name": x.name, 'pk': x.pk} for x in person.groups.all()]
+            groups = [{"name": x.name, 'pk': x.pk} for x in person.groups.all() if x.show_to(user)]
             badges = [{"name": x.name, "points": x.points} for x in person.badges.all()]
-            takentasks = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk, "description": x.description} for x in person.tasks.all()]
-            tasksIAssigned = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk, "description": x.description} for x in person.tasksIAssigned.all()]
-            completedtasks = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk, "description": x.description} for x in person.completedtasks.all()]
-            adminOf = [{"name": x.name, "pk": x.pk} for x in person.adminOf.all()]
-            posts = [{"description": x.description} for x in person.posts.all()]
+            takentasks = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk, "description": x.description, "status": x.get_status()} for x in person.tasks.all() if x.show_to(user)]
+            tasksIAssigned = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk, "description": x.description, "status": x.get_status()} for x in person.tasksIAssigned.all() if x.show_to(user)]
+            completedtasks = [{"group": {"name":x.group.first().name, "pk":x.group.first().pk}, "pk": x.pk, "description": x.description} for x in person.completedtasks.all() if x.show_to(user)]
+            adminOf = [{"name": x.name, "pk": x.pk} for x in person.adminOf.all() if x.show_to(user)]
+            posts = [{"description": x.description} for x in person.posts.all() if x.show_to(user)]
 
             response['result'] = True
             response['data'] = {
@@ -118,7 +116,7 @@ def create_group(request):
     if user:
         try:
             group = Group.objects.create(name=request.POST['name'],
-                description=request.POST['description'], private=request.POST.get('private', False))
+                description=request.POST['description'], private=json.loads(request.POST.get('private', "false")))
             user.groups.add(group)
             user.adminOf.add(group)
             user.save()
@@ -144,6 +142,10 @@ def get_group_details(request, pk):
         group = Group.objects.filter(pk=pk)
         if group:
             group = group[0]
+            if not group.show_to(user):
+                response['reason'] = "You don't have permission to view this"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
             posts = [{"description": x.description, "pk": x.pk} for x in group.posts.all()]
             tasks = [{"description": x.description, "pk": x.pk} for x in group.tasks.all()]
             for i,task in enumerate(group.tasks.all()):
@@ -206,6 +208,12 @@ def join_group(request, pk):
         group = Group.objects.filter(pk=pk)
         if group:
             group = group[0]
+
+            if not group.show_to(user):
+                if not (group.joining_code == request.POST.get('joining_code', "Wohoo.!!")):
+                    response['reason'] = "You don't have permission to be here or the joining code is incorrect."
+                    return HttpResponse(json.dumps(response), content_type="application/json")
+
             group.members.add(user)
             group.save()
             response['result'] = True
@@ -331,6 +339,10 @@ def remove_admin(request, group_pk, person_pk):
                 response['reason'] = "The person is already not an admin"
                 return HttpResponse(json.dumps(response), content_type="application/json")
 
+            if group.admins.all().count() == 1:
+                response['reason'] = "If you leave, there will be no admin of this group. This is not allowed. Either allot an admin before leaving or delete the group."
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
             person.adminOf.remove(group)
             person.save()
             group.save()
@@ -392,6 +404,10 @@ def get_post_details(request, pk):
         post = Post.objects.filter(pk=pk)
         if post:
             post = post[0]
+            if not post.show_to(user):
+                response['reason'] = "You don't have permission to view this"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
             response['result'] = True
             response['data'] = {
                 "group": {
@@ -447,7 +463,7 @@ def create_task(request, group_pk):
                 response['reason'] = "You're not an admin of this group"
                 return HttpResponse(json.dumps(response), content_type="application/json")
             try:
-                if 0 > int(request.POST.get('points', 1)) < 100:
+                if not (0 > int(request.POST.get('points', 1)) < 100):
                     response['reason'] = "You must allot between 0 and 100 points"
                     return HttpResponse(json.dumps(response), content_type="application/json")    
 
@@ -524,6 +540,11 @@ def get_task_details(request, pk):
         task = Task.objects.filter(pk=pk)
         if task:
             task = task[0]
+
+            if not task.show_to(user):
+                response['reason'] = "You don't have permission to view this"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
             response['result'] = True
             response['data'] = {
                             "pk": task.pk,
@@ -587,6 +608,11 @@ def accept_task(request, pk):
         task = Task.objects.filter(pk=pk)
         if task:
             task = task[0]
+
+            if not task.show_to(user):
+                response['reason'] = "You don't have permission to view this"
+                return HttpResponse(json.dumps(response), content_type="application/json")
+
             if not task.group.first() in user.groups.all():
                 response['reason'] = "You're not a part of the group that this task is of"
                 return HttpResponse(json.dumps(response), content_type="application/json")
@@ -704,6 +730,72 @@ def group_leaderboard(request, pk):
             response['reason'] = "No Group with this  PK found"
     else:
         response['reason'] = "not logged in"
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+@csrf_exempt
+def take_forgot_password_code(request):
+    response = {'result': False, 'reason': 'nope'}
+    if request.method != "POST":
+        response['reason'] = "GET"
+        return HttpResponse(json.dumps(response), content_type="application/json")
+    email = request.POST.get('email', None)
+    if not email:
+        response['reason'] = "Insufficent data"
+        return HttpResponse(json.dumps(response), content_type="application/json")
+    user = User.objects.filter(email=email)
+    if not user:
+        response['reason'] = "There isn't any user assosciated with this email"
+        return HttpResponse(json.dumps(response), content_type="application/json")
+    import pdb
+    pdb.set_trace()
+    user = user[0]
+    if not ForgotPasswordRequest.objects.filter(user=user):
+        temp = ForgotPasswordRequest.objects.create(user=user)
+        while True:
+            if ForgotPasswordRequest.objects.filter(key1=temp.key1).count() == 1: break
+            temp.delete()
+            temp = ForgotPasswordRequest.objects.create(user=user)
+    code = user.forgotPasswordRequest.key1
+
+    send_mail("Account Access - Groupie!",
+    "Hi, please use this code: '%s' in order to login."%code,
+    "Groupie Team <sambhav13085@iiitd.ac.in>", [user.email])
+
+    # send mail
+    print "CODE " + code
+
+    response['message'] = "Mail sent"
+    response['result'] = True
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+
+@csrf_exempt
+def give_forgot_password_code(request):
+    response = {'result': False, 'reason': 'nope'}
+    if request.method != "POST":
+        response['reason'] = "GET"
+        return HttpResponse(json.dumps(response), content_type="application/json")
+
+    code = request.POST.get('code', None)
+    if not code:
+        response['reason'] = "Insufficent data"
+        return HttpResponse(json.dumps(response), content_type="application/json")
+
+    requests = ForgotPasswordRequest.objects.filter(key1=code)
+    if not requests:
+        response['reason'] = "Wrong code"
+        return HttpResponse(json.dumps(response), content_type="application/json")
+
+    user = requests[0].user
+    requests.delete()
+
+    response['message'] = "Welcome back"
+    response['result'] = True
+    response['data'] = {
+            "pk": user.pk,
+            "key1": user.key1,
+            "key2": user.key2
+    }
     return HttpResponse(json.dumps(response), content_type="application/json")
 
 @csrf_exempt

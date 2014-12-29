@@ -38,7 +38,10 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'server',
     'corsheaders',
+    'djrill',
 )
+
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -85,6 +88,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+MANDRILL_API_KEY = "tAP8MerqJKS677iuM4FV1g"
+EMAIL_BACKEND = "djrill.mail.backends.djrill.DjrillBackend"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/

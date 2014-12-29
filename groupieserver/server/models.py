@@ -13,17 +13,32 @@ class Task(models.Model):
 	def isassigner(this, user):
 		return this.assigner == user
 	def isassignee(this, user):
-		return (this.assignedto == user) or (this.assignedto in user)
+		return (this.assignedto == user) or (user in this.assignedto.all())
+
+	def get_status(self):
+		if self.completedby.all():
+			return ('Completed', self.completedby.first().pk)
+		if self.assignedto.all():
+			return ('Ongoing', [x.pk for x in self.assignedto.all()])
+		return ('Open', None)
+
+	def show_to(self, user):
+		return any([self.groups.first().show_to(user), user in self.groups.first().members.all(),
+						user in self.groups.first().admins.all(), self.isassigner(user), self.isassignee(user)])
 
 class Post(models.Model):
 	description = models.CharField(max_length=1024)
 
-def generate_code(q):
+	def show_to(self, user):
+		return any([user in self.OP.all(), self.group.first().show_to(user), 
+				user in self.group.first().members.all(), user in self.group.first().admins.all()])
+
+def generate_code(q, numeric=False):
 	import string
 	import random
 	temp = []
 	temp.extend(string.digits)
-	temp.extend(string.letters)
+	if not numeric: temp.extend(string.letters)
 	value = []
 	for _ in xrange(q):
 		value.append(random.choice(temp))
@@ -38,8 +53,16 @@ class Group(models.Model):
 	joining_code = models.CharField(max_length=8, blank=False, default=lambda:generate_code(8))
 
 	def change_joining_code(self):
-		self.joining_code = generate_code(8)
+		temp = generate_code(8)
+		while(True):
+			if not Group.objects.filter(joining_code=temp): break
+			temp = generate_code(8)
+
+		self.joining_code = temp
 		self.save()
+
+	def show_to(self, user):
+		return any([not self.private, user in self.members.all(), user in self.admins.all()])
 
 class Badge(models.Model):
 	name = models.CharField(max_length=32)
@@ -132,4 +155,5 @@ class User(models.Model):
 
 
 class ForgotPasswordRequest(models.Model):
-	key1 = models.CharField(max_length=32, default=lambda: generate_code(32))
+	key1 = models.CharField(max_length=10, default=lambda: generate_code(10, numeric=True))
+	user = models.OneToOneField(User, related_name='forgotPasswordRequest')
