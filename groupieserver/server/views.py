@@ -147,7 +147,7 @@ def get_group_details(request, pk):
             posts = [{"description": x.description, "pk": x.pk} for x in group.posts.all()]
             tasks = [{"description": x.description, "pk": x.pk} for x in group.tasks.all()]
             for i,task in enumerate(group.tasks.all()):
-                tasks[i]['completedby'] = {"name": task.completedby.first().full_name(), "pk": tasks.completedby.first().full_name()} if \
+                tasks[i]['completedby'] = {"name": task.completedby.first().full_name(), "pk": task.completedby.first().full_name()} if \
                                             task.completedby.all() else None
 
             members = [{"name": x.full_name(), "pk": x.pk} for x in group.members.all()]
