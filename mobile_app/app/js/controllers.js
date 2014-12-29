@@ -210,7 +210,6 @@ var commonFunctions = {
 	},
 }
 
-
 var groupieAppControllers = angular.module('groupieAppControllers', []);
 
 
