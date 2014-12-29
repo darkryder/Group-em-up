@@ -746,8 +746,8 @@ def take_forgot_password_code(request):
     if not user:
         response['reason'] = "There isn't any user assosciated with this email"
         return HttpResponse(json.dumps(response), content_type="application/json")
-    import pdb
-    pdb.set_trace()
+    #import pdb
+    #pdb.set_trace()
     user = user[0]
     if not ForgotPasswordRequest.objects.filter(user=user):
         temp = ForgotPasswordRequest.objects.create(user=user)
