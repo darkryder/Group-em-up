@@ -214,20 +214,15 @@ var commonFunctions = {
 var groupieAppControllers = angular.module('groupieAppControllers', []);
 
 
-groupieAppControllers.controller('homePageController', ['$scope', '$http',
-	function($scope, $http){
+groupieAppControllers.controller('homePageController', ['$scope', '$http', '$location',
+	function($scope, $http, $location){
 
 		$scope.response_from_server = "Nothing"
 
 		$scope.server_test = function(){
 
-			// var temp = $http.get('https://blooming-badlands-6507.herokuapp.com/stuff/test_logged_in/');
-			var temp = $http.post('https://blooming-badlands-6507.herokuapp.com/stuff/test_logged_in/', {
-				'pk': '1',
-				'key1': '7ekDAErMWS9enfmkkbE26rPovMd3lAkd',
-				'key2': 'Z5MCEuMek3ALipPAJuttuHdDWobmVFHL',
-			});
-			
+			var temp = $http.get('https://blooming-badlands-6507.herokuapp.com/stuff/test/');
+
 			console.log("Sending");
 			temp.success(function(data){
 				// $scope.response_from_server = JSON.parse(JSON.stringify(data))['result'];
@@ -241,6 +236,31 @@ groupieAppControllers.controller('homePageController', ['$scope', '$http',
 				console.log("error" + status);
 				
 			})
+		}
+
+		$scope.join_private_group = function(){
+			commonFunctions.show_server_contact_attempt();
+			var which_pk = $scope.private_group_pk;
+			var data = commonFunctions.get_auth_data();
+			data.joining_code = $scope.private_group_joining_code;
+			$http.post(commonFunctions.get_api_link() + 'groups/join/' + which_pk + '/', data).
+				success(function(data){
+					if (commonFunctions.api_call_successfull(data)){
+						commonFunctions.hide_server_contact();
+						console.log("JOINED GROUP");
+						console.log(JSON.stringify(data));
+						$location.path("groups/" + which_pk + '/');
+					} else {
+						commonFunctions.show_server_contact_failed();
+						console.log("API call: response from server. result false");
+						console.log("RESPONSE: " + JSON.stringify(data));
+					}
+				}).
+				error(function(data, status){
+					console.log("error data " + data);
+					console.log("error status " + status);
+					commonFunctions.show_server_contact_failed();
+				})
 		}
 	}]);
 
@@ -263,7 +283,6 @@ groupieAppControllers.controller('profilePageController', ['$scope', '$http', '$
 		}
 		else{
 			var auth_data = commonFunctions.get_auth_data();
-
 			commonFunctions.show_server_contact_attempt();
 			
 			// TODO remove fetch details to use get_self_details after caching output
@@ -386,7 +405,63 @@ groupieAppControllers.controller('signupController', ['$scope', '$http', '$locat
 				console.log("error" + status);
 				commonFunctions.show_server_contact_failed();
 			});
+		};
+
+		$scope.get_lost_password_mail = function(){
+			var data = {'email': $scope.lost_email};
+
+			commonFunctions.show_server_contact_attempt();
+			$http.post(_hiddenCommonData.api_link+'forgotpassword/takecode/', data).
+			success(function(data){
+				if (commonFunctions.api_call_successfull(data)){
+					console.log(JSON.stringify(data))
+					// commonFunctions._set_auth_data(data.data);
+					// commonFunctions.set_logged_in(true);
+					// commonFunctions._set_self_email($scope.email);
+					commonFunctions.hide_server_contact();
+					console.log("Signup completed");
+					$location.path("profile/");
+				} else {
+					commonFunctions.show_server_contact_failed();
+					console.log("API call: response from server. result false");
+					console.log("RESPONSE: " + JSON.stringify(data));
+				}
+			}).
+			error(function(data, status){
+				console.log("error" + data);
+				console.log("error" + status);
+				commonFunctions.show_server_contact_failed();
+			});
+		};
+
+
+		$scope.give_lost_access_code = function(){
+			var data = {'code': $scope.lost_access_code};
+
+			commonFunctions.show_server_contact_attempt();
+			$http.post(_hiddenCommonData.api_link+'forgotpassword/givecode/', data).
+			success(function(data){
+				if (commonFunctions.api_call_successfull(data)){
+					console.log(JSON.stringify(data))
+					commonFunctions._set_auth_data(data.data);
+					commonFunctions.set_logged_in(true);
+					commonFunctions._set_self_email($scope.email);
+					commonFunctions.hide_server_contact();
+					console.log("Signup completed");
+					$location.path("profile/");
+				} else {
+					commonFunctions.show_server_contact_failed();
+					console.log("API call: response from server. result false");
+					console.log("RESPONSE: " + JSON.stringify(data));
+				}
+			}).
+			error(function(data, status){
+				console.log("error" + data);
+				console.log("error" + status);
+				commonFunctions.show_server_contact_failed();
+			});
 		}
+
 	}]);
 
 /* Allows creating new groups
