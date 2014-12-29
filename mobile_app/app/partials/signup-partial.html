@@ -6,3 +6,14 @@ Email: <input type="text" ng-model="email"><br />
 Gender: <select ng-model="gender"><option value="male">Male</option><option value="female">Female</option></select><br />
 <input type="button" value="Signup now" ng-click="signup()" /><br/>
 <hr />
+
+<strong>Already have an account ?</strong>
+<br />
+Email: <input type="text" ng-model="lost_email">
+<button ng-click="get_lost_password_mail()">Get login code!</button><br />
+
+
+<strong>Already have an access code ?</strong>
+<br />
+Access Code: <input type="text" ng-model="lost_access_code">
+<button ng-click="give_lost_access_code()">Login!</button><br />

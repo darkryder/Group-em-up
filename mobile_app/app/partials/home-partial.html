@@ -2,19 +2,9 @@ This is the main home page
 <h1>Response: {{ response_from_server }}</h1>
 <input type="button" ng-click="server_test()" value="TEST SERVER">
 
-
 <br />
-Go to <a href="#/profile/">My profile</a>
-<br /> 
-<b>Details</b>
 
-<h1>People</h1>
-
-<div ng-repeat="person in people">
-	Name:  {{ person.name }}<br />
-	Email:  {{ person.email }}<br />
-	Gender:  {{ person.gender }}<br />
-<hr />
-
-
-</div>
+<h2>Join a private group</h2>
+Key: <input type="text" ng-model="private_group_pk" /> <br />
+Code: <input type="text" ng-model="private_group_joining_code"> <br />
+<button ng-click="join_private_group()">Join</button> 
