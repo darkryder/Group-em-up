@@ -463,7 +463,7 @@ def create_task(request, group_pk):
                 response['reason'] = "You're not an admin of this group"
                 return HttpResponse(json.dumps(response), content_type="application/json")
             try:
-                if not (0 > int(request.POST.get('points', 1)) < 100):
+                if not (0 < int(request.POST.get('points', 1)) <= 100):
                     response['reason'] = "You must allot between 0 and 100 points"
                     return HttpResponse(json.dumps(response), content_type="application/json")    
 
