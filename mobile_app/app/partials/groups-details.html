@@ -45,3 +45,4 @@ Tasks: <span ng-if="bucket.group.tasks.length == 0">No tasks started yet</span> 
 <span ng-if="bucket.joinable">  <a ng-click="join_group(bucket.group.pk)">JOIN</a> </span><br />
 <span ng-if="bucket.deletable"> <a ng-click="delete_group(bucket.group.pk)"> DELETE</a> </span><br />
 <span ng-if="bucket.leavable">  <a ng-click="leave_group(bucket.group.pk)">LEAVE</a> </span><br />
+<span ng-if="bucket.deletable"> <a ng-click="change_code(bucket.group.pk)"> CHANGE CODE</a> </span><br />
