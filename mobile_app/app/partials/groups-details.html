@@ -38,7 +38,7 @@ Tasks: <span ng-if="bucket.group.tasks.length == 0">No tasks started yet</span> 
 	<ul>
 		<li ng-repeat="task in $parent.bucket.group.tasks">
 			<a href="#/tasks/{{ task.pk }}/"><strong>{{ task.description }}</strong></a>
-			completed by: {{ task.completedby }}
+			completed by: <a href="#/person/{{ task.completedby.pk }}/">{{ task.completedby.name }}</a>
 		</li>
 	</ul>
 </span>
