@@ -2,7 +2,7 @@
 
 Description: {{ bucket.task.description  }}<br />
 Points: {{ bucket.task.points }}<br />
-Group : <a href="#/tasks/{{ bucket.task.group.pk }}/">{{ bucket.task.group.name }}</a><br />
+Group : <a href="#/groups/{{ bucket.task.group.pk }}/">{{ bucket.task.group.name }}</a><br />
 Assigner: <a href="#/person/{{ bucket.task.assigner.pk}}">{{ bucket.task.assigner.name }}</a><br />
 Assigend To:
 	<ul>
@@ -10,4 +10,16 @@ Assigend To:
 			<a href="#/person/{{p.pk}}/">{{ p.name }}</a>
 		</li>
 	</ul>
-Completed By: {{ bucket.task.completedby }} <br />
+Completed By:<a href="#/person/{{ bucket.task.completedby.pk}}"> {{ bucket.task.completedby.name }} <br />
+
+
+<a ng-click="accept_task()"> ACCEPT</a> <br />
+<a ng-click="reject_task()"> REJECT</a> <br />
+<select ng-model="completedby">
+	<optgroup ng-repeat="person in bucket.task.assignedto">
+		<option value="{{person.pk}}">{{ person.name }}</option>
+	</optgroup>
+</select>
+<a ng-click="complete_task()"> COMPLETE</a> 
+<br />
+<a ng-click="delete_task()"> DELETE</a> <br />
