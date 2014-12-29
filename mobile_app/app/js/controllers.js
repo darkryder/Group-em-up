@@ -114,30 +114,28 @@ var commonFunctions = {
 		this.get_storage().setItem('auth_data', JSON.stringify(auth_data));
 	},
 
-	get_self_details: function(){
-		return JSON.parse(this.get_storage().getItem('self_details'));
-	},
-
-	set_self_details: function(data_from_server){
-		var data = data_from_server.data;
-		data.email = this._get_self_email;
-		this.get_storage().setItem('self_details',
-						JSON.stringify(data));
-	},
-
-	_get_self_email: function(){
-		return this.get_storage().getItem('_self_email');
-	},
-	
-	_set_self_email: function(email){
-		return this.get_storage().setItem('_self_email', email);
-	},
 
 	// this follows builder pattern. It will return 
 	// the implemented jqeury $.post
 	fetch_self_details: function(http){
 		return this.fetch_person_details(http, this.get_auth_data()['pk']);
 	},
+	get_self_details: function(){
+		return JSON.parse(this.get_storage().getItem('self_details'));
+	},
+	set_self_details: function(data_from_server){
+		var data = data_from_server.data;
+		data.email = this._get_self_email;
+		this.get_storage().setItem('self_details',
+						JSON.stringify(data));
+	},
+	_get_self_email: function(){
+		return this.get_storage().getItem('_self_email');
+	},
+	_set_self_email: function(email){
+		return this.get_storage().setItem('_self_email', email);
+	},
+
 
 	// this follows builder pattern. It will return 
 	// the implemented jqeury $.post
@@ -145,27 +143,70 @@ var commonFunctions = {
 		var auth_data = this.get_auth_data();
 		return http.post(_hiddenCommonData.api_link + 'person/' + who_pk +'/', auth_data);
 	},
-
 	get_person_details: function(who_pk){
 
 	},
-
 	set_person_details: function(who_pk, data_from_server){
 
 	},
 
+	// saves pk of all groups whose data is cached
+	_get_all_cached_groups: function(){
+		var result = this.get_storage().getItem('cached_groups');
+		if (result == null){
+			this.get_storage().setItem('cached_groups', JSON.stringify([]));
+			return [];
+		} else{
+			return JSON.parse(result);
+		}
+	},
 	fetch_group_details: function(http, which_pk){
 		var auth_data = this.get_auth_data();
 		return http.post(_hiddenCommonData.api_link + 'groups/' + which_pk + '/', auth_data);
 	},
-
+	get_group_details: function(which_pk){
+		var result = this.get_storage().getItem('group_' + which_pk);
+		return (result == null ? null : JSON.parse(result));
+	},
 	set_group_details: function(which, data_from_server){
-
+		this.get_storage().setItem('group_' + which, JSON.stringify(data_from_server));
+	},
+	// data should be either fetched / or gotten and passed to this method.
+	is_person_member_of_group: function(who_pk, group_data){
+		if (group_data == null) return false;
+		for(var i = 0; i < group_data.members.length; i++){
+			if (who_pk == group_data.members[i].pk) return true;
+		}
+		return false;
+	},
+	is_person_admin_of_group: function(who_pk, group_data){
+		if (group_data == null) return false;
+		for(var i = 0; i < group_data.admins.length; i++){
+			if (who_pk == group_data.members[i].pk) return true;
+		}
+		return false;
 	},
 
+
+	_get_all_cached_tasks: function(){
+		var result = this.get_storage().getItem('cached_tasks');
+		if (result == null){
+			this.get_storage().setItem('cached_tasks', JSON.stringify([]));
+			return [];
+		} else{
+			return JSON.parse(result);
+		}
+	},
 	fetch_task_details: function(http, task_pk){
 		var auth_data = this.get_auth_data();
 		return http.post(_hiddenCommonData.api_link + 'tasks/' + task_pk + '/', auth_data);
+	},
+	get_task_details: function(task_pk){
+		var result = this.get_storage().getItem('task_' + which_pk);
+		return (result == null ? null : JSON.parse(result));
+	},
+	set_task_details: function(which, data_from_server){
+		this.get_storage().setItem('task_' + which, JSON.stringify(data_from_server));
 	},
 }
 
@@ -399,8 +440,8 @@ groupieAppControllers.controller('groupsNewController', ['$scope', '$location', 
  * Fetches / gets the data of the specifed group.
  * Shows all the details.
  */
-groupieAppControllers.controller('groupSpecificViewController', ['$scope', '$http', '$location', '$routeParams',
-	function($scope, $http, $location, $routeParams){
+groupieAppControllers.controller('groupSpecificViewController', ['$scope', '$http', '$location', '$routeParams', '$route',
+	function($scope, $http, $location, $routeParams, $route){
 
 		if (!commonFunctions.is_logged_in()){
 			console.log("not logged in");
@@ -409,12 +450,23 @@ groupieAppControllers.controller('groupSpecificViewController', ['$scope', '$htt
 			$scope.bucket = {group: commonFunctions.get_empty_group_object()};
 			var group_pk = $routeParams.group_pk;
 
+			$scope.bucket.deletable = false;
+			$scope.bucket.joinable = false;
+			$scope.bucket.leavable = false;
+
 			commonFunctions.show_server_contact_attempt();
 			commonFunctions.fetch_group_details($http, group_pk).
 				success(function(data){
 					if (commonFunctions.api_call_successfull(data)){
 						commonFunctions.hide_server_contact();
+
 						$scope.bucket.group = data.data;
+						$scope.bucket.deletable = commonFunctions.is_person_admin_of_group(
+													commonFunctions.get_auth_data().pk, data.data);
+						$scope.bucket.joinable = !commonFunctions.is_person_member_of_group(
+													commonFunctions.get_auth_data().pk, data.data);
+						$scope.bucket.leavable = !$scope.bucket.deletable && !$scope.bucket.joinable;
+
 						console.log("FETCHED: " + JSON.stringify(data));
 					} else{
 						commonFunctions.show_server_contact_failed();
@@ -427,6 +479,74 @@ groupieAppControllers.controller('groupSpecificViewController', ['$scope', '$htt
 					console.log("error status " + status);
 					commonFunctions.show_server_contact_failed();
 				});
+
+			$scope.join_group = function(which_pk){
+				commonFunctions.show_server_contact_attempt();
+				var data = commonFunctions.get_auth_data();
+				$http.post(commonFunctions.get_api_link() + 'groups/join/' + which_pk + '/', data).
+					success(function(data){
+						if (commonFunctions.api_call_successfull(data)){
+							commonFunctions.hide_server_contact();
+							console.log("JOINED GROUP");
+							console.log(JSON.stringify(data));
+							$route.reload();
+						} else {
+							commonFunctions.show_server_contact_failed();
+							console.log("API call: response from server. result false");
+							console.log("RESPONSE: " + JSON.stringify(data));
+						}
+					}).
+					error(function(data, status){
+						console.log("error data " + data);
+						console.log("error status " + status);
+						commonFunctions.show_server_contact_failed();
+					})
+			};
+			$scope.leave_group = function(which_pk){
+				commonFunctions.show_server_contact_attempt();
+				var data = commonFunctions.get_auth_data();
+				$http.post(commonFunctions.get_api_link() + 'groups/leave/' + which_pk + '/', data).
+					success(function(data){
+						if (commonFunctions.api_call_successfull(data)){
+							commonFunctions.hide_server_contact();
+							console.log("LEFT GROUP");
+							console.log(JSON.stringify(data));
+							$route.reload();
+						} else {
+							commonFunctions.show_server_contact_failed();
+							console.log("API call: response from server. result false");
+							console.log("RESPONSE: " + JSON.stringify(data));
+						}
+					}).
+					error(function(data, status){
+						console.log("error data " + data);
+						console.log("error status " + status);
+						commonFunctions.show_server_contact_failed();
+					})
+			};
+			$scope.delete_group = function(which_pk){
+				commonFunctions.show_server_contact_attempt();
+				var data = commonFunctions.get_auth_data();
+				$http.post(commonFunctions.get_api_link() + 'groups/delete/' + which_pk + '/', data).
+					success(function(data){
+						if (commonFunctions.api_call_successfull(data)){
+							commonFunctions.hide_server_contact();
+							console.log("DELETED GROUP");
+							console.log(JSON.stringify(data));
+							$location.path("/");
+
+						} else {
+							commonFunctions.show_server_contact_failed();
+							console.log("API call: response from server. result false");
+							console.log("RESPONSE: " + JSON.stringify(data));
+						}
+					}).
+					error(function(data, status){
+						console.log("error data " + data);
+						console.log("error status " + status);
+						commonFunctions.show_server_contact_failed();
+					})
+			};
 		}
 	}]);
 
