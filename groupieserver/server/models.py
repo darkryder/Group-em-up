@@ -23,8 +23,8 @@ class Task(models.Model):
 		return ('Open', None)
 
 	def show_to(self, user):
-		return any([self.groups.first().show_to(user), user in self.groups.first().members.all(),
-						user in self.groups.first().admins.all(), self.isassigner(user), self.isassignee(user)])
+		return any([self.group.first().show_to(user), user in self.group.first().members.all(),
+						user in self.group.first().admins.all(), self.isassigner(user), self.isassignee(user)])
 
 class Post(models.Model):
 	description = models.CharField(max_length=1024)
