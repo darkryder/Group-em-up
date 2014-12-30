@@ -725,6 +725,10 @@ def group_leaderboard(request, pk):
 
             #sort here and slice here
             response['result'] = True
+            response['group'] = { 
+                        "name": group.name, 
+                        "pk": group.pk , 
+                        'points': sum([x.points for x in group.tasks.all()])}
             response['data'] = answer
         else:
             response['reason'] = "No Group with this  PK found"
