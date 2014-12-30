@@ -1,0 +1,11 @@
+<h1>Group Leaderboard</h1>
+
+Group Name: <a href="#/groups/{{ bucket.group.pk }}">{{ bucket.group.name }}</a><br />
+Points: {{ bucket.group.points }}<br />
+
+<h1>Wall of Fame </h1>
+<ol>
+	<li ng-repeat="person in wall">
+		<a href="#/person/{{person.pk}}/"><strong>{{ person.name }}</strong></a>: {{person.points}} 
+	</li>
+</ol>

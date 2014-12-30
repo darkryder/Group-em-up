@@ -51,6 +51,14 @@ groupieApp.config(['$routeProvider',
 				templateUrl: 'partials/tasks-details.html',
 				controller: 'taskSpecificViewController'
 			}).
+			when('/leaderboard/group/:group_pk', {
+				templateUrl: 'partials/leaderboard-group.html',
+				controller: 'leaderboardGroupController'
+			}).
+			when('/leaderboard/global', {
+				templateUrl: 'partials/leaderboard-global.html',
+				controller: 'leaderboardGlobalController'
+			}).
 			otherwise({
 				redirectTo: '/home/'
 			});
