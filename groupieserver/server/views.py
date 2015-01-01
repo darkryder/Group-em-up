@@ -164,6 +164,8 @@ def get_group_details(request, pk):
                 "admins": admins,
                 "points": sum([x.points for x in group.tasks.all()])
             }
+            if user in group.admins.all():
+                response['data']['joining_code'] = group.joining_code
             response['result'] = True
         else:
             response['reason'] = "No Group with this  PK found"
