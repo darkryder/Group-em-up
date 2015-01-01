@@ -182,7 +182,7 @@ var commonFunctions = {
 	is_person_admin_of_group: function(who_pk, group_data){
 		if (group_data == null) return false;
 		for(var i = 0; i < group_data.admins.length; i++){
-			if (who_pk == group_data.members[i].pk) return true;
+			if (who_pk == group_data.admins[i].pk) return true;
 		}
 		return false;
 	},
@@ -524,36 +524,22 @@ groupieAppControllers.controller('groupSpecificViewController', ['$scope', '$htt
 			$scope.bucket = {group: commonFunctions.get_empty_group_object()};
 			var group_pk = $routeParams.group_pk;
 
-			$scope.bucket.deletable = false;
 			$scope.bucket.joinable = false;
 			$scope.bucket.leavable = false;
-			$scope.bucket.addable_as_admin = []
-			$scope.who_to_add = ''
-			$scope.who_to_remove = ''
-
+			
 			commonFunctions.show_server_contact_attempt();
 			commonFunctions.fetch_group_details($http, group_pk).
 				success(function(data){
 					if (commonFunctions.api_call_successfull(data)){
 						commonFunctions.hide_server_contact();
 
-						var admins = []
-						for(var i = 0; i < data.data.admins.length; i++){
-							admins.push(data.data.admins[i].pk);
-						};
-
-						for(var i = 0; i < data.data.members.length; i++){
-							if (admins.indexOf(data.data.members[i].pk) == -1){
-								$scope.bucket.addable_as_admin.push(data.data.members[i]);
-							}
-						};
 
 						$scope.bucket.group = data.data;
-						$scope.bucket.deletable = commonFunctions.is_person_admin_of_group(
-													commonFunctions.get_auth_data().pk, data.data);
 						$scope.bucket.joinable = !commonFunctions.is_person_member_of_group(
 													commonFunctions.get_auth_data().pk, data.data);
 						$scope.bucket.leavable = !$scope.bucket.deletable && !$scope.bucket.joinable;
+						$scope.bucket.admin = commonFunctions.is_person_admin_of_group(
+													commonFunctions.get_auth_data().pk, data.data);
 
 						console.log("FETCHED: " + JSON.stringify(data));
 					} else{
@@ -611,104 +597,6 @@ groupieAppControllers.controller('groupSpecificViewController', ['$scope', '$htt
 						console.log("error status " + status);
 						commonFunctions.show_server_contact_failed();
 					})
-			};
-			$scope.delete_group = function(which_pk){
-				commonFunctions.show_server_contact_attempt();
-				var data = commonFunctions.get_auth_data();
-				$http.post(commonFunctions.get_api_link() + 'groups/delete/' + which_pk + '/', data).
-					success(function(data){
-						if (commonFunctions.api_call_successfull(data)){
-							commonFunctions.hide_server_contact();
-							console.log("DELETED GROUP");
-							console.log(JSON.stringify(data));
-							$location.path("/");
-
-						} else {
-							commonFunctions.show_server_contact_failed();
-							console.log("API call: response from server. result false");
-							console.log("RESPONSE: " + JSON.stringify(data));
-						}
-					}).
-					error(function(data, status){
-						console.log("error data " + data);
-						console.log("error status " + status);
-						commonFunctions.show_server_contact_failed();
-					})
-			};
-
-			$scope.change_code = function(which_pk){
-				commonFunctions.show_server_contact_attempt();
-				var data = commonFunctions.get_auth_data();
-				$http.post(commonFunctions.get_api_link() + 'groups/code/change/' + which_pk + '/', data).
-					success(function(data){
-						if (commonFunctions.api_call_successfull(data)){
-							commonFunctions.hide_server_contact();
-							console.log("CODE CHANGED");
-							console.log(JSON.stringify(data));
-
-						} else {
-							commonFunctions.show_server_contact_failed();
-							console.log("API call: response from server. result false");
-							console.log("RESPONSE: " + JSON.stringify(data));
-						}
-					}).
-					error(function(data, status){
-						console.log("error data " + data);
-						console.log("error status " + status);
-						commonFunctions.show_server_contact_failed();
-					})
-			};
-
-			$scope.add_admin = function(){
-				var who = $scope.who_to_add;
-				var data = commonFunctions.get_auth_data();
-				var link  = commonFunctions.get_api_link() + 'groups/assignadmin/' + 
-								$scope.bucket.group.pk + '/' + who + '/';
-				commonFunctions.show_server_contact_attempt();
-				$http.post(link, data).
-					success(function(data){
-						if (commonFunctions.api_call_successfull(data)){
-							commonFunctions.hide_server_contact();
-							console.log("Added as admin");
-							console.log(JSON.stringify(data));
-							$route.reload()
-						} else {
-							commonFunctions.show_server_contact_failed();
-							console.log("API call: response from server. result false");
-							console.log("RESPONSE: " + JSON.stringify(data));
-						}
-					}).
-					error(function(data, status){
-						console.log("error data " + data);
-						console.log("error status " + status);
-						commonFunctions.show_server_contact_failed();
-					});
-			};
-
-			$scope.remove_admin = function(){
-				var who = $scope.who_to_remove;
-				var data = commonFunctions.get_auth_data();
-				var link  = commonFunctions.get_api_link() + 'groups/removeadmin/' + 
-								$scope.bucket.group.pk + '/' + who + '/';
-				commonFunctions.show_server_contact_attempt();
-				$http.post(link, data).
-					success(function(data){
-						if (commonFunctions.api_call_successfull(data)){
-							commonFunctions.hide_server_contact();
-							console.log("Removed as an admin");
-							console.log(JSON.stringify(data));
-							$route.reload()
-						} else {
-							commonFunctions.show_server_contact_failed();
-							console.log("API call: response from server. result false");
-							console.log("RESPONSE: " + JSON.stringify(data));
-						}
-					}).
-					error(function(data, status){
-						console.log("error data " + data);
-						console.log("error status " + status);
-						commonFunctions.show_server_contact_failed();
-					});
 			};
 		}
 	}]);
@@ -1007,5 +895,159 @@ groupieAppControllers.controller('leaderboardGlobalController', ['$scope', '$htt
 					console.log("error status " + status);
 					commonFunctions.show_server_contact_failed();
 				});
+		}
+	}])
+
+groupieAppControllers.controller('groupAdminController', ['$scope', '$http', '$routeParams', '$location', '$route',
+	function($scope, $http, $routeParams, $location, $route){
+		if (!commonFunctions.is_logged_in()){
+			console.log("not logged in");
+			$location.path("signup/");
+		} else {
+			console.log("In")
+			var group_pk = $routeParams.group_pk;
+			$scope.bucket = {group: commonFunctions.get_empty_group_object()};
+			$scope.bucket.addable_as_admin = []
+			$scope.who_to_add = ''
+			$scope.who_to_remove = ''
+
+			$scope.delete_group = function(which_pk){
+				commonFunctions.show_server_contact_attempt();
+				var data = commonFunctions.get_auth_data();
+				$http.post(commonFunctions.get_api_link() + 'groups/delete/' + which_pk + '/', data).
+					success(function(data){
+						if (commonFunctions.api_call_successfull(data)){
+							commonFunctions.hide_server_contact();
+							console.log("DELETED GROUP");
+							console.log(JSON.stringify(data));
+							$location.path("/");
+
+						} else {
+							commonFunctions.show_server_contact_failed();
+							console.log("API call: response from server. result false");
+							console.log("RESPONSE: " + JSON.stringify(data));
+						}
+					}).
+					error(function(data, status){
+						console.log("error data " + data);
+						console.log("error status " + status);
+						commonFunctions.show_server_contact_failed();
+					})
+			};
+
+			$scope.change_code = function(which_pk){
+				commonFunctions.show_server_contact_attempt();
+				var data = commonFunctions.get_auth_data();
+				$http.post(commonFunctions.get_api_link() + 'groups/code/change/' + which_pk + '/', data).
+					success(function(data){
+						if (commonFunctions.api_call_successfull(data)){
+							commonFunctions.hide_server_contact();
+							console.log("CODE CHANGED");
+							console.log(JSON.stringify(data));
+
+						} else {
+							commonFunctions.show_server_contact_failed();
+							console.log("API call: response from server. result false");
+							console.log("RESPONSE: " + JSON.stringify(data));
+						}
+					}).
+					error(function(data, status){
+						console.log("error data " + data);
+						console.log("error status " + status);
+						commonFunctions.show_server_contact_failed();
+					})
+			};
+
+			$scope.add_admin = function(){
+				var who = $scope.who_to_add;
+				var data = commonFunctions.get_auth_data();
+				var link  = commonFunctions.get_api_link() + 'groups/assignadmin/' + 
+								$scope.bucket.group.pk + '/' + who + '/';
+				commonFunctions.show_server_contact_attempt();
+				$http.post(link, data).
+					success(function(data){
+						if (commonFunctions.api_call_successfull(data)){
+							commonFunctions.hide_server_contact();
+							console.log("Added as admin");
+							console.log(JSON.stringify(data));
+							$route.reload()
+						} else {
+							commonFunctions.show_server_contact_failed();
+							console.log("API call: response from server. result false");
+							console.log("RESPONSE: " + JSON.stringify(data));
+						}
+					}).
+					error(function(data, status){
+						console.log("error data " + data);
+						console.log("error status " + status);
+						commonFunctions.show_server_contact_failed();
+					});
+			};
+
+			$scope.remove_admin = function(){
+				var who = $scope.who_to_remove;
+				var data = commonFunctions.get_auth_data();
+				var link  = commonFunctions.get_api_link() + 'groups/removeadmin/' + 
+								$scope.bucket.group.pk + '/' + who + '/';
+				commonFunctions.show_server_contact_attempt();
+				$http.post(link, data).
+					success(function(data){
+						if (commonFunctions.api_call_successfull(data)){
+							commonFunctions.hide_server_contact();
+							console.log("Removed as an admin");
+							console.log(JSON.stringify(data));
+							$route.reload()
+						} else {
+							commonFunctions.show_server_contact_failed();
+							console.log("API call: response from server. result false");
+							console.log("RESPONSE: " + JSON.stringify(data));
+						}
+					}).
+					error(function(data, status){
+						console.log("error data " + data);
+						console.log("error status " + status);
+						commonFunctions.show_server_contact_failed();
+					});
+			};
+
+			commonFunctions.show_server_contact_attempt()
+			var data = commonFunctions.get_auth_data();
+			var link = commonFunctions.get_api_link() + 'groups/' + group_pk + '/';
+			$http.post(link, data).
+				success(function(data){
+					if (commonFunctions.api_call_successfull(data)){
+						commonFunctions.hide_server_contact();
+						console.log("DONE: " + JSON.stringify(data));
+						$scope.bucket.group = data.data;
+						if (commonFunctions.is_person_admin_of_group(
+						commonFunctions.get_auth_data().pk, data.data)){
+
+							var admins = []
+							for(var i = 0; i < data.data.admins.length; i++){
+								admins.push(data.data.admins[i].pk);
+							};
+
+							for(var i = 0; i < data.data.members.length; i++){
+								if (admins.indexOf(data.data.members[i].pk) == -1){
+									$scope.bucket.addable_as_admin.push(data.data.members[i]);
+								}
+							};
+						} else {
+							console.log("Not an admin of the group");
+							$location.path('/');
+						}
+					} else{
+						commonFunctions.show_server_contact_failed();
+						console.log("API call: response from server. result false");
+						console.log("RESPONSE: " + JSON.stringify(data));
+						$location.path("/");
+					}
+				}).
+				error(function(data, status){
+					console.log("error data " + data);
+					console.log("error status " + status);
+					commonFunctions.show_server_contact_failed();
+				});
+
 		}
 	}])

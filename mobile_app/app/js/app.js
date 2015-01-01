@@ -4,7 +4,8 @@
 
 var groupieApp = angular.module('groupieApp',[
 	'ngRoute',
-	'groupieAppControllers']);
+	'groupieAppControllers',
+	]);
 
 /* Routes are defined herein
  * Difficult battles with trainers ensue
@@ -34,6 +35,10 @@ groupieApp.config(['$routeProvider',
 			when('/groups/new/', {
 				templateUrl: 'partials/groups-new.html',
 				controller: 'groupsNewController'
+			}).
+			when('/groups/admin/:group_pk/',{
+				templateUrl: 'partials/groups-admin.html',
+				controller: 'groupAdminController'
 			}).
 			when('/groups/:group_pk/', {
 				templateUrl: 'partials/groups-details.html',

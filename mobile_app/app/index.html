@@ -1,85 +1,134 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" ng-app="groupieApp">
-<head>
-  <meta charset="utf-8">
-  <title>Groupie</title>
-  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
-  <link rel="stylesheet" href="css/app.css">
-  <script src="bower_components/angular/angular.js"></script>
-  <script src="bower_components/angular-route/angular-route.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/controllers.js"></script>
-  <script src="js/jquery.js"></script>
-</head>
-<body>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Groupie</title>
+    <meta name="description" content="Collaborate and get work done, while having fun">
+    <meta name="author" content="darkryder">
+    <!-- <link rel="icon" href="../../favicon.ico"> -->
 
-<style type="text/css">
-.spinner {
-  width: 40px;
-  height: 40px;
-
-  position: relative;
-  margin: 100px auto;
-}
-
-.double-bounce1, .double-bounce2, .double-bounce3 {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  opacity: 0.6;
-  position: absolute;
-  top: 0;
-  left: 0;
-  
-  -webkit-animation: bounce 2.0s infinite ease-in-out;
-  animation: bounce 2.0s infinite ease-in-out;
-}
-
-.double-bounce1 {
-  background-color: #00f;
-}
-
-.double-bounce2 {
-  background-color: #fff;
-}
-
-.double-bounce3 {
-  background-color: #f00;
-  display: none;
-}
-
-.double-bounce2{
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s;
-}
+    <link rel="stylesheet" href="css/app.css">
+    <link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/bootstrap-autohidingnavbar/dist/jquery.bootstrap-autohidingnavbar.min.js"></script>
 
 
-@-webkit-keyframes bounce {
-  0%, 100% { -webkit-transform: scale(0.0) }
-  50% { -webkit-transform: scale(1.0) }
-}
+    <style type="text/css">
+    .spinner {
+      width: 30px;
+      height: 30px;
 
-@keyframes bounce {
-  0%, 100% { 
-    transform: scale(0.0);
-    -webkit-transform: scale(0.0);
-  } 50% { 
-    transform: scale(1.0);
-    -webkit-transform: scale(1.0);
-  }
-}
-</style>
-<a href="#/home/">Home</a>
-<a href="#/signup/">Signup</a>
-<a href="#/profile/">Profile</a>
-<a href="#/groups/new/">Add group</a>
-<hr />
-<div ng-view></div>
-<div style="display:none" id="server-connection-spinner-base" class="spinner">
-  <div class="double-bounce1" id="server-connection-spinner-success"></div>
-  <div class="double-bounce2" id="server-connection-spinner-white"></div>
-  <div class="double-bounce3" id="server-connection-spinner-fail"></div>
-</div>
+      position: relative;
+    }
 
-</body>
+    .double-bounce1, .double-bounce2, .double-bounce3 {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      opacity: 0.6;
+      position: absolute;
+      top: 0;
+      left: 0;
+      
+      -webkit-animation: bounce 2.0s infinite ease-in-out;
+      animation: bounce 2.0s infinite ease-in-out;
+    }
+
+    .double-bounce1 {
+      background-color: #00f;
+    }
+
+    .double-bounce2 {
+      background-color: #fff;
+    }
+
+    .double-bounce3 {
+      background-color: #f00;
+      display: none;
+    }
+
+    .double-bounce2{
+      -webkit-animation-delay: -1.0s;
+      animation-delay: -1.0s;
+    }
+
+
+    @-webkit-keyframes bounce {
+      0%, 100% { -webkit-transform: scale(0.0) }
+      50% { -webkit-transform: scale(1.0) }
+    }
+
+    @keyframes bounce {
+      0%, 100% { 
+        transform: scale(0.0);
+        -webkit-transform: scale(0.0);
+      } 50% { 
+        transform: scale(1.0);
+        -webkit-transform: scale(1.0);
+      }
+    }
+    </style>
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container" style="width:100%;">
+        <ul class="nav navbar-nav navbar-left ">
+          <li>
+            <a href="#/home/">Groupie</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right ">
+          <li>
+            <div style="display:none" id="server-connection-spinner-base" class="spinner">
+              <span class="double-bounce1" id="server-connection-spinner-success"></span>
+              <span class="double-bounce2" id="server-connection-spinner-white"></span>
+              <span class="double-bounce3" id="server-connection-spinner-fail"></span>
+            </div>
+          </li>
+        </ul>       
+      </div>
+    </nav>
+
+    <nav class="navbar navbar-inverse navbar-fixed-bottom">
+      <div class="container" style="">
+        <div class="row">
+          <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3">
+            <a href="#/profile/"><span class="glyphicon glyphicon-user"></span></a>
+          </div>
+          <div class="col-md-offset-7 col-sm-offset-7 col-xs-offset-7 col-lg-offset-7 col-md-1 col-sm-1 col-xs-1 col-lg-1">
+            <a href="#/leaderboard/global/"><span class="glyphicon glyphicon-tower"></span></a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container" style="padding-top:55px; padding-bottom:45px;">
+
+      <div ng-view></div>
+
+    </div><!-- /.container -->
+
+    <script type="text/javascript">
+    $(".navbar-fixed-top").autoHidingNavbar({
+      // see next for specifications
+    });
+    </script>
+
+  </body>
 </html>
+<!-- 
+LINKS TO PUT SOMEWHERE OR THE OTHER. REMEMBER THEY EXIST
+HOME
+SIGNUP
+PROFILE
+ADD GROUP
+TEST CONNECTION WITH SERVER
+ -->
