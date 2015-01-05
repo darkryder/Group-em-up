@@ -1,4 +1,4 @@
-This is the main home page
+<!-- This is the main home page
 <h1>Response: {{ response_from_server }}</h1>
 <input type="button" ng-click="server_test()" value="TEST SERVER">
 
@@ -11,3 +11,168 @@ Code: <input type="text" ng-model="private_group_joining_code"> <br />
 <button ng-click="join_private_group()">Join</button> 
 
 <br /><a href="#/leaderboard/global">Global Leaderboard</a>
+ -->
+<div style="text-align:center;">
+	<canvas id="paint" style="border:10px solid #000000; display: inline;"></canvas>
+</div>
+
+<script type="text/javascript">
+	var canvas = document.getElementById("paint")
+	var ctx = canvas.getContext("2d");
+
+	var _size = Math.min(window.innerWidth, window.innerHeight) * 4/5;
+
+  	ctx.canvas.width  = _size;
+	ctx.canvas.height = _size;
+
+	var w = ctx.canvas.width;
+	var h = ctx.canvas.height;
+
+	var initCenterX = canvas.width / 2;
+  	var initCenterY = canvas.height / 2;
+	var moveableRadius = 0.05 * w;
+	var radiusAtPoints = 0.1 * w;
+
+	ctx.shadowBlur = 25;
+	ctx.shadowColor = "rgb(0, 0, 0)";
+	ctx.textAlign = "center";
+
+	var actionTaken = false;
+
+	decisionPoints = [
+		{'x': 0, 'y': h/2, 'text': "nothing", 'alreadyTriggered': false,'action': function(){
+			baseActionHandler(this, function(){
+				//
+				console.log("did nothing")
+			});
+		}},
+		{'x': w/2 , 'y': 0, 'text': "Add group", 'alreadyTriggered': false,'action': function(){
+			baseActionHandler(this, function(){
+				window.location.assign("#/groups/new/")
+			});
+		}},
+		{'x': w, 'y': h/2, 'text': "Profile", 'alreadyTriggered': false,'action': function(){
+			baseActionHandler(this, function(){
+				window.location.assign("#/profile/");
+			});
+		}},
+		{'x': w/2, 'y': h, 'text': "Leaderboard", 'alreadyTriggered': false,'action': function(){
+			baseActionHandler(this, function(){
+				window.location.assign("#/leaderboard/global/");
+			});
+		}},
+	];
+
+	distanceBetween = function(x, y, decisionPoint){
+		var _x = x - decisionPoint.x;
+		var _y = y - decisionPoint.y;
+		var _ =  Math.sqrt( _x*_x + _y*_y );
+		return _;
+	}
+
+	ifActivateAction = function(posX, posY, decidingPoint, isHorizontalDecisionPoint){
+		var _ = 0;
+		if (isHorizontalDecisionPoint){
+			_ = Math.abs(posX - decidingPoint.x);
+		} else{
+			_ = Math.abs(posY - decidingPoint.y);
+		}
+		return (_ < (moveableRadius))
+	}
+
+
+	ctx.beginPath();
+	ctx.arc(initCenterX, initCenterY, moveableRadius, 0, 2 * Math.PI, true);
+	ctx.closePath();
+	for(var i = 0; i < decisionPoints.length; i++){
+		var _ = decisionPoints[i];
+		ctx.arc(_.x, _.y, radiusAtPoints, 0, 2 * Math.PI, true);
+		ctx.closePath();
+	}
+
+	ctx.fill();
+
+	increaseInRadius = function(distance, isHorizontalDecisionPoint){
+		var maxPossibleDistance = isHorizontalDecisionPoint ? w/2: h/2;
+		var _ = ((maxPossibleDistance - distance)/maxPossibleDistance) * (radiusAtPoints - moveableRadius);
+		return _;
+	}
+
+	function a(event){
+
+		if (actionTaken) return;
+
+		a = canvas.getBoundingClientRect()
+
+		var centerX = event.pageX - a.left
+		var centerY = event.pageY - a.top;
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height)
+		ctx.beginPath();
+
+		var distances = []
+		for(var i = 0; i < decisionPoints.length; i++){
+			distances.push(distanceBetween(centerX, centerY, decisionPoints[i]));
+		}
+
+		var _ = Math.min.apply(Math, distances);
+		nearestPointIndex = distances.indexOf(_);
+
+		var _increase = increaseInRadius(distances[nearestPointIndex], (nearestPointIndex%2 == 0));
+
+		ctx.arc(centerX, centerY, moveableRadius + _increase, 0, 2 * Math.PI, true);
+		ctx.closePath();
+		for(var i = 0; i < decisionPoints.length; i++){
+			var _ = decisionPoints[i];
+			if (i == nearestPointIndex){	// move the circle too towards the center
+				if (i%2==0){ 				// is horizontal decision point
+					if (_.y == 0){
+						ctx.arc(_.x, _.y, radiusAtPoints + _increase, 0, 2 * Math.PI, false);
+					} else {
+						ctx.arc(_.x, _.y, radiusAtPoints - _increase, 0, 2 * Math.PI, false);
+					}
+				} else {
+					if (_.y == 0){
+						ctx.arc(_.x, _.y, radiusAtPoints - _increase, 0, 2 * Math.PI, false);
+					} else {
+						ctx.arc(_.x, _.y, radiusAtPoints - _increase, 0, 2 * Math.PI, false);
+					}
+				}
+			} else {
+				ctx.arc(_.x, _.y, radiusAtPoints, 0, 2 * Math.PI, false);
+			}
+			ctx.closePath();
+		}
+		ctx.fillStyle = "rgba(0, 0, 0, 1)";
+		ctx.fill();
+
+		ctx.fillStyle = "rgba(0, 255, 0," + (_increase/(radiusAtPoints - moveableRadius) - 0.2) + ")";
+		ctx.font = "bold " +  (_size/200) + "em" + " Georgia";
+		ctx.fillText(decisionPoints[nearestPointIndex].text, initCenterX, initCenterY)
+
+
+		if (ifActivateAction(centerX, centerY, decisionPoints[nearestPointIndex], (nearestPointIndex%2 == 0))){
+			// since the framework that I'm making is basically only meant for navigation purposes, this won't cause any side effect as anyway the user should be frisked away
+			if (! decisionPoints[nearestPointIndex].alreadyTriggered){
+				decisionPoints[nearestPointIndex].alreadyTriggered = true;
+				decisionPoints[nearestPointIndex].action();
+			}
+		}
+	}
+
+	baseActionHandler = function(decisionPoint, next){
+		ctx.fillStyle = "rgba(255, 0, 0, 1)";
+		ctx.font = "bold " +  (_size/200) + "em" + " Georgia";
+		ctx.fillText(decisionPoint.text, initCenterX, initCenterY);
+		actionTaken = true;
+		
+		setTimeout(function(){
+			// console.log("perform action");
+			next();
+		}, 1000)
+	}
+
+
+	canvas.addEventListener("mousemove", a);
+	canvas.addEventListener("touchmove", a);
+</script>

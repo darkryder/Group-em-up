@@ -1,7 +1,8 @@
 Name:  {{ bucket.group.name }} <br />
 Description:  {{ bucket.group.description }}<br />
 Points:  {{ bucket.group.points }}<br />
-
+Joining Key: {{ bucket.group.pk }}<br />
+Joining Code: {{ bucket.group.joining_code }}
 
 <span ng-if="bucket.deletable"> <a  ng-click="delete_group(bucket.group.pk)"> DELETE</a> </span><br />
 <br />
