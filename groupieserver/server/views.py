@@ -849,3 +849,18 @@ def change_joining_code(request, pk):
     else:
         response['reason'] = "not logged in"
     return HttpResponse(json.dumps(response), content_type="application/json")
+
+
+@csrf_exempt
+def home(request):
+    response = {'result': False, 'reason': 'nope'}
+    user = is_logged_in(request)
+    if not user:
+        response['reason'] = "not logged in"
+        return HttpResponse(json.dumps(response), content_type="application/json")
+
+    answer = [{"name": g.name, "pk": g.pk, "description": g.description} for g in Group.objects.all() if g.show_to(user)]
+
+    response['result'] = True
+    response['data'] = answer
+    return HttpResponse(json.dumps(response), content_type="application/json")

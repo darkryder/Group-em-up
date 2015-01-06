@@ -17,7 +17,7 @@ urlpatterns = patterns('',
     url(r'^person/(?P<pk>\d+)/$', views.get_person_details), # works
 
 
-    # url(r'^home/$', views.home),
+    url(r'^home/$', views.home),
 
     url(r'^leaderboard/global/$', views.global_leaderboard),
     url(r'^leaderboard/group/(?P<pk>\d+)/$', views.group_leaderboard),
