@@ -255,7 +255,7 @@ def leave_group(request, pk):
         if group:
             group = group[0]
             if user in group.admins.all():
-                request['reason'] = "You are an admin. You can't exit the group"
+                response['reason'] = "You are an admin. You can't exit the group"
                 return HttpResponse(json.dumps(response), content_type="application/json")
 
             if user in group.members.all():
