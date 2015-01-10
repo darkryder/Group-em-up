@@ -659,6 +659,7 @@ groupieAppControllers.controller('groupSpecificViewController', ['$scope', '$htt
 						if (commonFunctions.api_call_successfull(data)){
 							commonFunctions.hide_server_contact();
 							console.log("DONE: " + JSON.stringify(data));
+							$location.path("groups/" + group_pk)
 						} else{
 							commonFunctions.show_server_contact_failed();
 							console.log("API call: response from server. result false");
@@ -686,7 +687,7 @@ groupieAppControllers.controller('groupSpecificViewController', ['$scope', '$htt
 			var group_pk = $routeParams.group_pk;
 			$scope.bucket = {group : commonFunctions.get_empty_group_object()};
 			$scope.description = "";
-			$scope.points = 10;
+			$scope.points = "1 to 100"
 			$scope.assignee = "";
 
 			// fetches the names of the members

@@ -12,14 +12,14 @@
     <li class="clearfix">
 		<h5 style="text-align:center"><span ng-show="bucket.person.first_name == ''">Email</span>
 		<span ng-show="bucket.person.first_name != ''"> 
-		{{ bucket.person.email }} {{ bucket.person.last_name }}
+		{{ bucket.person.email }}
 		</span></h5>					
     </li>
     
     <li class="clearfix">
 		<h5 style="text-align:center"><span ng-show="bucket.person.first_name == ''">Points</span>
 		<span ng-show="bucket.person.first_name != ''"> 
-		{{ bucket.person.points }}
+		<strong>Points: </strong>{{ bucket.person.points }}
 		</span></h5>					
     </li>
     
