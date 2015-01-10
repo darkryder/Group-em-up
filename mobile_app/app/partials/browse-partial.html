@@ -1,0 +1,23 @@
+<div id="container">
+  <ul style="list-style: none;">
+    <li class="clearfix">
+		<h3>Join a private group</h3>
+		<span class="form-inline">
+			<input style="max-width:15%" placeholder="Key" type="text" ng-model="private_group_pk" />
+			<input style="max-width:50%" placeholder="Joining code" type="text" ng-model="private_group_joining_code">
+			<button class="btn btn-warning" ng-click="join_private_group()">Join</button> 
+		</span>
+    </li>
+  </ul>
+</div>
+
+<div id="container">
+  <ul style="list-style: none;">
+    <li class="clearfix" ng-repeat="group in bucket.groups">
+      <a href="#/groups/{{ group.pk }}/">
+		  <h4>{{ group.name }}</h4>
+	  <p>{{ group.description }} </p>
+	  </a>
+    </li>
+  </ul>
+</div>

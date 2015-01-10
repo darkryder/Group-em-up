@@ -16,9 +16,13 @@ var groupieApp = angular.module('groupieApp',[
 groupieApp.config(['$routeProvider',
 	function($routeProvider){
 		$routeProvider.
-			when('/home/',{
+			when('/home/', {
 				templateUrl: 'partials/home-partial.html',
 				controller: 'homePageController'
+			}).
+			when('/browse/', {
+				templateUrl: 'partials/browse-partial.html',
+				controller: 'browsePageController'
 			}).
 			when('/profile/', {
 				templateUrl: 'partials/profile-partial.html',

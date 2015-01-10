@@ -1,11 +1,20 @@
-<h1>Group Leaderboard</h1>
+<div id="container">
 
-Group Name: <a href="#/groups/{{ bucket.group.pk }}">{{ bucket.group.name }}</a><br />
-Points: {{ bucket.group.points }}<br />
+  <ul style="list-style: none;">
+  	<h4>
+  		<strong>Group Name: </strong><a href="#/groups/{{ bucket.group.pk }}">{{ bucket.group.name }}</a>
+  	</h4>
+  	<h4>
+  		<strong>Points:</strong> {{ bucket.group.points }}
+  	</h4>
+    <li class="clearfix" ng-show="wall.length == 0">
+		<h5 style="text-align:center">No one's worthy enough.</h5>	
+    </li>
+    <li class="clearfix" ng-show="wall.length != 0" ng-repeat="person in wall">
+		<h5 style="text-align:center">
+			<a href="#/person/{{person.pk}}/"><strong>{{ person.name }}: </strong>{{person.points}} </a> 
+		</h5>	
+    </li>
 
-<h1>Wall of Fame </h1>
-<ol>
-	<li ng-repeat="person in wall">
-		<a href="#/person/{{person.pk}}/"><strong>{{ person.name }}</strong></a>: {{person.points}} 
-	</li>
-</ol>
+  </ul>
+</div>

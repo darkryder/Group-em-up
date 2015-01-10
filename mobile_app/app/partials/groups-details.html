@@ -1,55 +1,113 @@
-<h1>Group Details</h1>
+<div id="container">
+  <ul style="list-style: none;">
+    <span ng-show="bucket.admin">
+		<a class="btn btn-warning pull-right btn-sm" style="padding:5px 5px 5px 5px;" href="#/groups/admin/{{ bucket.group.pk }}/">Manage Group</a>
+	</span>
+	<span ng-show="bucket.group.name != ''">
+		<a href="#/leaderboard/group/{{ bucket.group.pk }}" class="btn btn-info pull-right btn-sm" >Leaderboard</a>
+	</span>
 
-Name:  {{ bucket.group.name }} <br />
-Description:  {{ bucket.group.description }}<br />
-Points:  {{ bucket.group.points }}<br />
-Joining Code: {{ bucket.group.joining_code }}
+    <h4 >Details</h4>
+    <li class="clearfix">
+		<h5 style="text-align:center"><span ng-show="bucket.group.name == ''">Name</span>
+		<span ng-show="bucket.group.name != ''"> 
+		{{ bucket.group.name }}
+		</span></h5>					
+    </li>
+    
+    <li class="clearfix">
+		<h5 style="text-align:center"><span ng-show="bucket.group.name == ''">Description</span>
+		<span ng-show="bucket.group.name != ''"> 
+		{{ bucket.group.description}}
+		</span></h5>	
+    </li>
 
-Members:<span ng-if="bucket.group.members.length == 0">This group is empty</span> <br />
-<span ng-if="bucket.group.members.length != 0">
- 	<ul>
-		<li ng-repeat="member in $parent.bucket.group.members">
-			<a href="#/person/{{member.pk}}">{{ member.name }}</a>
-		</li>
-	</ul>
-</span>
+    <li class="clearfix">
+		<h5 style="text-align:center"><span ng-show="bucket.group.name == ''">Points</span>
+		<span ng-show="bucket.group.name != ''"> 
+		<strong>Points:</strong> {{ bucket.group.points }}
+		</span></h5>					
+    </li>
+    
+    <hr />
+    <h4 class="clearfix">Members
+    	<span ng-show="bucket.joinable"><a class="btn btn-success pull-right" ng-click="join_group(bucket.group.pk)">Join</a> </span>
+		<span ng-show="bucket.leavable"><a class="btn btn-danger pull-right" ng-click="leave_group(bucket.group.pk)">Leave</a> </span>
+	</h4>
+    <li class="clearfix" ng-show="bucket.group.members.length == 0">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.group.members.length == 0">There are no members of this group.</span>
+		</h5>					
+    </li>
+    <li class="clearfix" ng-repeat="member in bucket.group.members" ng-show="bucket.group.name != ''">
+		<a href="#/person/{{member.pk}}/">
+			<h5 style="text-align:center">
+				<span ng-show="bucket.group.name != ''"> 
+					{{ member.name }}
+				</span>
+			</h5>					
+		</a>
+    </li>
 
-Admins of Group: <span ng-if="bucket.group.admins.length == 0">This group has no admin</span> <br />
-<span ng-if="bucket.group.admins.length != 0">
-	<ul>
-		<li ng-repeat="admin in $parent.bucket.group.admins">
-			<a href="#/person/{{admin.pk}}">{{ admin.name }}</a>
-		</li>
-	</ul>
-</span>
+    <hr />
+    <h4>Admins</h4>
+    <li class="clearfix" ng-show="bucket.group.admins.length == 0">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.group.admins.length == 0">There are no admins of this group.</span>
+		</h5>
+    </li>
+    <li class="clearfix" ng-repeat="admin in bucket.group.admins" ng-show="bucket.group.name != ''">
+		<a href="#/person/{{admin.pk}}/">
+			<h5 style="text-align:center">
+				<span ng-show="bucket.group.name!= ''"> 
+					{{ admin.name }}
+				</span>
+			</h5>	
+		</a>
+    </li>
 
-<span ng-if="bucket.group.name !== ''"> <a href="#/posts/new/{{bucket.group.pk}}/">Add a new post </a></span><br />
-Posts: <span ng-if="bucket.group.posts.length == 0">No posts yet</span> <br />
-<span ng-if="bucket.group.posts.length != 0">
-	<ul>
-		<li ng-repeat="post in $parent.bucket.group.posts">
-			{{ post.description }}
-		</li>
-	</ul>
-</span>
+    <hr />
+    <h4 class="clearfix">
+    	Posts
+    	<span ng-show="bucket.admin"> <a class="pull-right btn btn-info btn-sm" href="#/posts/new/{{bucket.group.pk}}/">Add post</a></span>
+    </h4>
+    <li class="clearfix" ng-show="bucket.group.posts.length == 0">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.group.posts.length == 0">There are no posts on this group.</span>
+		</h5>
+    </li>
+    <li class="clearfix" ng-repeat="post in bucket.group.posts" ng-show="bucket.group.name != ''">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.group.name != ''"> 
+				{{ post.description }}
+			</span>
+		</h5>
+    </li>
 
-<span ng-if="bucket.group.name !== ''"> <a href="#/tasks/new/{{bucket.group.pk}}/">Add a new task </a></span><br />
-Tasks: <span ng-if="bucket.group.tasks.length == 0">No tasks started yet</span> <br />
-<span ng-if="bucket.group.tasks.length != 0">
-	<ul>
-		<li ng-repeat="task in $parent.bucket.group.tasks">
-			<a href="#/tasks/{{ task.pk }}/"><strong>{{ task.description }}</strong></a>
-			completed by: <a href="#/person/{{ task.completedby.pk }}/">{{ task.completedby.name }}</a>
-		</li>
-	</ul>
-</span>
+    <hr />
+    <h4 class="clearfix">
+    	Tasks
+    	<span ng-show="bucket.admin"> <a class="pull-right btn btn-info btn-sm" href="#/tasks/new/{{bucket.group.pk}}/">Add Task</a></span>
+    </h4>
+    <li class="clearfix" ng-show="bucket.group.tasks.length == 0">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.group.tasks.length == 0">There aren't any tasks on the group yet.</span>
+		</h5>
+    </li>
+    <li class="clearfix" ng-repeat="task in bucket.group.tasks" ng-show="bucket.group.name != ''">
+    	<a href="#/tasks/{{ task.pk }}">
+			<h5 style="text-align:center">
+				<span ng-show="bucket.group.name != ''"> 
+					{{ task.description }}
+					<span ng-show="task.completedby.name != null">
+						<strong>Completed by {{ task.completedby.name }}</strong>
+					</span>
+				</span>
+			</h5>
+		</a>
+    </li>
+    <hr />
 
-<span ng-show="bucket.joinable">  <a ng-click="join_group(bucket.group.pk)">JOIN</a> </span><br />
-<span ng-show="bucket.leavable">  <a ng-click="leave_group(bucket.group.pk)">LEAVE</a> </span><br />
-
-
-<a href="#/leaderboard/group/{{ bucket.group.pk }}">Leaderboard</a><br />
-
-<span ng-show="bucket.admin">
-	<a href="#/groups/admin/{{ bucket.group.pk }}/">Manage Group</a>
-</span>
+  </ul>
+</div>
+<!-- Gender: <span ng-if="bucket.person.gender === true">Female</span><span ng-if="bucket.person.gender === false">Male</span> <br /> -->

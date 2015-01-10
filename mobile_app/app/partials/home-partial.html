@@ -1,21 +1,6 @@
-<!-- This is the main home page
-<h1>Response: {{ response_from_server }}</h1>
-<input type="button" ng-click="server_test()" value="TEST SERVER">
-
-<br />
-
-<a href="#/groups/new/">Add group</a>
-<h2>Join a private group</h2>
-Key: <input type="text" ng-model="private_group_pk" /> <br />
-Code: <input type="text" ng-model="private_group_joining_code"> <br />
-<button ng-click="join_private_group()">Join</button> 
-
-<br /><a href="#/leaderboard/global">Global Leaderboard</a>
- -->
 <div style="text-align:center;">
-	<canvas id="paint" style="border:10px solid #000000; display: inline;"></canvas>
+	<canvas id="paint" style="border:1px solid #000000; display: inline;"></canvas>
 </div>
-
 <script type="text/javascript">
 	var canvas = document.getElementById("paint")
 	var ctx = canvas.getContext("2d");
@@ -40,15 +25,14 @@ Code: <input type="text" ng-model="private_group_joining_code"> <br />
 	var actionTaken = false;
 
 	decisionPoints = [
-		{'x': 0, 'y': h/2, 'text': "nothing", 'alreadyTriggered': false,'action': function(){
+		{'x': 0, 'y': h/2, 'text': "Discover", 'alreadyTriggered': false,'action': function(){
 			baseActionHandler(this, function(){
-				//
-				console.log("did nothing")
+				window.location.assign("#/browse/");
 			});
 		}},
-		{'x': w/2 , 'y': 0, 'text': "Add group", 'alreadyTriggered': false,'action': function(){
+		{'x': w/2 , 'y': 0, 'text': "Create group", 'alreadyTriggered': false,'action': function(){
 			baseActionHandler(this, function(){
-				window.location.assign("#/groups/new/")
+				window.location.assign("#/groups/new/");
 			});
 		}},
 		{'x': w, 'y': h/2, 'text': "Profile", 'alreadyTriggered': false,'action': function(){
@@ -126,16 +110,16 @@ Code: <input type="text" ng-model="private_group_joining_code"> <br />
 			var _ = decisionPoints[i];
 			if (i == nearestPointIndex){	// move the circle too towards the center
 				if (i%2==0){ 				// is horizontal decision point
-					if (_.y == 0){
-						ctx.arc(_.x, _.y, radiusAtPoints + _increase, 0, 2 * Math.PI, false);
+					if (_.x == 0){
+						ctx.arc(_.x + _increase, _.y, radiusAtPoints + _increase, 0, 2 * Math.PI, false);
 					} else {
-						ctx.arc(_.x, _.y, radiusAtPoints - _increase, 0, 2 * Math.PI, false);
+						ctx.arc(_.x - _increase, _.y, radiusAtPoints + _increase, 0, 2 * Math.PI, false);
 					}
 				} else {
 					if (_.y == 0){
-						ctx.arc(_.x, _.y, radiusAtPoints - _increase, 0, 2 * Math.PI, false);
+						ctx.arc(_.x, _.y + _increase, radiusAtPoints + _increase, 0, 2 * Math.PI, false);
 					} else {
-						ctx.arc(_.x, _.y, radiusAtPoints - _increase, 0, 2 * Math.PI, false);
+						ctx.arc(_.x, _.y - _increase, radiusAtPoints + _increase, 0, 2 * Math.PI, false);
 					}
 				}
 			} else {
@@ -169,7 +153,7 @@ Code: <input type="text" ng-model="private_group_joining_code"> <br />
 		setTimeout(function(){
 			// console.log("perform action");
 			next();
-		}, 1000)
+		}, 500)
 	}
 
 

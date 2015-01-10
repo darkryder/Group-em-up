@@ -1,25 +1,81 @@
-<h1>Task Details</h1>
-
-Description: {{ bucket.task.description  }}<br />
-Points: {{ bucket.task.points }}<br />
-Group : <a href="#/groups/{{ bucket.task.group.pk }}/">{{ bucket.task.group.name }}</a><br />
-Assigner: <a href="#/person/{{ bucket.task.assigner.pk}}">{{ bucket.task.assigner.name }}</a><br />
-Assigend To:
-	<ul>
-		<li ng-repeat="p in bucket.task.assignedto">
-			<a href="#/person/{{p.pk}}/">{{ p.name }}</a>
-		</li>
-	</ul>
-Completed By:<a href="#/person/{{ bucket.task.completedby.pk}}"> {{ bucket.task.completedby.name }} <br />
-
-
-<a ng-click="accept_task()"> ACCEPT</a> <br />
-<a ng-click="reject_task()"> REJECT</a> <br />
-<select ng-model="completedby">
-	<optgroup ng-repeat="person in bucket.task.assignedto">
-		<option value="{{person.pk}}">{{ person.name }}</option>
-	</optgroup>
-</select>
-<a ng-click="complete_task()"> COMPLETE</a> 
-<br />
-<a ng-click="delete_task()"> DELETE</a> <br />
+<h2>Task details</h2>
+<div id="container" style="vertical-align:middle;">
+  <ul style="list-style: none;">
+    <li class="clearfix">
+    	<table style="border-spacing:10px 10px;border-collapse: separate;" >
+    		<tr>
+    			<td><strong>Description: </strong></td>
+    			<td>
+    				{{ bucket.task.description  }}
+				</td>
+			</tr>
+			<tr>
+				<td><strong>Points: </strong></td>
+				<td>{{ bucket.task.points }}</td>
+			</tr>
+			<tr>
+				<td><strong>Group: </strong></td>
+				<td>
+					<a href="#/groups/{{ bucket.task.group.pk }}/">{{ bucket.task.group.name }}</a>
+				</td>
+			</tr>
+			<tr>
+				<td><strong>Status:</strong></td>
+				<td ng-if="bucket.task.description != ''">
+					<span ng-if="(bucket.task.assignedto.length == 0) && bucket.task.completedby == null">
+						No one's taken up this task yet.
+					</span>
+					<span ng-if="bucket.task.assignedto.length != 0 && bucket.task.completedby == null">
+						People have taken up the task.
+					</span>
+					<span ng-if="bucket.task.completedby != null">
+						Completed.
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td><strong>Assigned by: </strong></td>
+				<td><a href="#/person/{{ bucket.task.assigner.pk}}">{{ bucket.task.assigner.name }}</td>
+			</tr>
+			<tr>
+				<td><strong>Taken up by: </strong></td>
+				<td>
+					<ul>
+						<li style="margin:5xp; padding:5px;" ng-repeat="p in bucket.task.assignedto">
+							<a href="#/person/{{p.pk}}/">{{ p.name }}</a>
+						</li>
+					</ul>
+				</td>
+			</tr>
+			<tr>
+				<td><strong>Completed by: </strong></td>
+				<td>
+					<span ng-if="bucket.task.completedby == null">Incomplete</span>
+					<span ng-if="bucket.task.completedby != null"><a href="#/person/{{ bucket.task.completedby.pk}}"> {{ bucket.task.completedby.name }}</span>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" style="text-align:center;">
+					<button class="btn btn-success" ng-if="bucket.task.ismember && !leavableTask && bucket.task.completedby == null" ng-click="accept_task()"> Accept</button>
+					<button class="btn btn-warning" ng-if="bucket.task.ismember && leavableTask" ng-click="reject_task()">Leave</button>
+				</td>
+			</tr>
+			<tr ng-show="bucket.task.admin && bucket.task.completedby == null">
+				<td>
+					<select style="max-width:70%" ng-model="completedby">
+						<optgroup ng-repeat="person in bucket.task.assignedto">
+							<option value="{{person.pk}}">{{ person.name }}</option>
+						</optgroup>
+					</select>
+				</td>
+				<td><button class="btn btn-info" ng-click="complete_task()">Complete</button></td>
+			</tr>
+			<tr ng-show="bucket.task.admin">
+				<td colspan="2" style="text-align:center;">
+					<button class="btn btn-danger" ng-click="delete_task()"> Delete</button>
+				</td>
+			</tr>
+    	</table>
+    </li>
+  </ul>
+</div>	

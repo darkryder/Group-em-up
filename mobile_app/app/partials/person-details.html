@@ -1,71 +1,137 @@
-<h1>Profile</h1>
+<div id="container">
+  <ul style="list-style: none;">
+    
+    <h4 >Details</h4>
+    <li class="clearfix">
+		<h5 style="text-align:center"><span ng-show="bucket.person.first_name == ''">Name</span>
+		<span ng-show="bucket.person.first_name != ''"> 
+		{{ bucket.person.first_name }} {{ bucket.person.last_name }}
+		</span></h5>					
+    </li>
+        
+    <li class="clearfix">
+		<h5 style="text-align:center"><span ng-show="bucket.person.first_name == ''">Points</span>
+		<span ng-show="bucket.person.first_name != ''"> 
+		{{ bucket.person.points }}
+		</span></h5>					
+    </li>
+    
+    <hr />
+    <h4>Groups</h4>
+    <li class="clearfix" ng-show="bucket.person.groups.length == 0">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.person.groups.length == 0">The person has not joined any group.</span>
+		</h5>					
+    </li>
+    <li class="clearfix" ng-repeat="group in bucket.person.groups" ng-show="bucket.person.first_name != ''">
+		<a href="#/groups/{{group.pk}}/">
+			<h5 style="text-align:center">
+				<span ng-show="bucket.person.first_name != ''"> 
+					{{ group.name }}
+				</span>
+			</h5>					
+		</a>
+    </li>
+
+    <hr />
+    <h4>Admin of groups</h4>
+    <li class="clearfix" ng-show="bucket.person.adminOf.length == 0">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.person.adminOf.length == 0">The person is not an admin of any group.</span>
+		</h5>					
+    </li>
+    <li class="clearfix" ng-repeat="group in bucket.person.adminOf" ng-show="bucket.person.first_name != ''">
+		<a href="#/groups/{{group.pk}}/">
+			<h5 style="text-align:center">
+				<span ng-show="bucket.person.first_name != ''"> 
+					{{ group.name }}
+				</span>
+			</h5>					
+		</a>
+    </li>
+
+    <hr />
+    <h4>Posts</h4>
+    <li class="clearfix" ng-show="bucket.person.posts.length == 0">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.person.posts.length == 0">The person has not posted anything yet.</span>
+		</h5>					
+    </li>
+    <li class="clearfix" ng-repeat="post in bucket.person.posts" ng-show="bucket.person.first_name != ''">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.person.first_name != ''"> 
+				{{ post.description }}
+			</span>
+		</h5>
+    </li>
+
+    <hr />
+    <h4>Tasks Assigned</h4>
+    <li class="clearfix" ng-show="bucket.person.tasksIAssigned.length == 0">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.person.tasksIAssigned.length == 0">The person hasn't assigned any tasks to anyone yet.</span>
+		</h5>					
+    </li>
+    <li class="clearfix" ng-repeat="task in bucket.person.tasksIAssigned" ng-show="bucket.person.first_name != ''">
+    	<a href="#/tasks/{{ task.pk }}">
+			<h5 style="text-align:center">
+				<span ng-show="bucket.person.first_name != ''"> 
+					<strong>{{ task.group.name }}:  </strong>{{ task.description }}
+				</span>
+			</h5>
+		</a>
+    </li>
+    <hr />
+    <h4>Tasks Taken</h4>
+    <li class="clearfix" ng-show="bucket.person.takentasks.length == 0">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.person.takentasks.length == 0">The person hasn't taken up any tasks yet.</span>
+		</h5>					
+    </li>
+    <li class="clearfix" ng-repeat="task in bucket.person.takentasks" ng-show="bucket.person.first_name != ''">
+    	<a href="#/tasks/{{ task.pk }}">
+			<h5 style="text-align:center">
+				<span ng-show="bucket.person.first_name != ''"> 
+					<strong>{{ task.group.name }}:  </strong>{{ task.description }}
+				</span>
+			</h5>
+		</a>
+    </li>
+    <hr />
+    <h4>Tasks Completed</h4>
+    <li class="clearfix" ng-show="bucket.person.completedtasks.length == 0">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.person.completedtasks.length == 0">The person hasn't completed any tasks yet.</span>
+		</h5>					
+    </li>
+    <li class="clearfix" ng-repeat="task in bucket.person.completedtasks" ng-show="bucket.person.first_name != ''">
+    	<a href="#/tasks/{{ task.pk }}">
+			<h5 style="text-align:center">
+				<span ng-show="bucket.person.first_name != ''"> 
+					<strong>{{ task.group.name }}:  </strong>{{ task.description }}
+				</span>
+			</h5>
+		</a>
+    </li>
+
+    <hr />
+    <h4>Badges</h4>
+    <li class="clearfix" ng-show="bucket.person.badges.length == 0">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.person.badges.length == 0">The person hasn't been awarded any badges yet.</span>
+		</h5>					
+    </li>
+    <li class="clearfix" ng-repeat="badge in bucket.person.badges" ng-show="bucket.person.first_name != ''">
+		<h5 style="text-align:center">
+			<span ng-show="bucket.person.first_name != ''"> 
+				{{ badge.name }}: <strong>{{ badge.points }}</strong>
+			</span>
+		</h5>
+    </li>
+
+  </ul>
+</div>
 
 
-First Name:  {{ bucket.person.first_name }} <br />
-Last Name:  {{ bucket.person.last_name }}<br />
-Points: {{ bucket.person.points }} <br />
 
-Gender: <span ng-if="bucket.person.gender === true">Female</span><span ng-if="bucket.person.gender === false">Male</span> <br />
-
-Groups:<span ng-if="bucket.person.adminOf.length == 0">Not an admin of any group</span> <br />
-<span ng-if="bucket.person.adminOf.length != 0">
- 	<ul>
-		<li ng-repeat="group in bucket.person.groups">
-			<a href="#/groups/{{group.pk}}/">{{ group.name }}</a>
-		</li>
-	</ul>
-</span>
-
-Admin of Groups: <span ng-if="bucket.person.adminOf.length == 0">Not an admin of any group</span> <br />
-<span ng-if="bucket.person.adminOf.length != 0">
-	<ul>
-		<li ng-repeat="group in $parent.bucket.person.adminOf">
-			<a href="#/groups/{{group.pk}}/">{{ group.name }}</a>
-		</li>
-	</ul>
-</span>
-
-Posts: <span ng-if="bucket.person.posts.length == 0">Not posted anything yet</span> <br />
-<span ng-if="bucket.person.posts.length != 0">
-	<ul>
-		<li ng-repeat="post in $parent.bucket.person.posts">
-			{{ post.description }}
-		</li>
-	</ul>
-</span>
-
-Tasks Assigned: <span ng-if="bucket.person.tasksIAssigned.length == 0">No tasks assigned yet</span> <br />
-<span ng-if="bucket.person.tasksIAssigned.length != 0">
-	<ul>
-		<li ng-repeat="task in $parent.bucket.person.tasksIAssigned">
-			<a href="#/tasks/{{ task.pk }}"><strong>{{ task.description }}</strong></a> @ <a href="#/groups/{{ task.group.pk }}/">{{ task.group.name }}</a>
-		</li>
-	</ul>
-</span>
-
-Tasks taken: <span ng-if="bucket.person.takentasks.length == 0">No tasks taken yet</span> <br />
-<span ng-if="bucket.person.takentasks.length != 0">
-	<ul>
-		<li ng-repeat="task in $parent.bucket.person.takentasks">
-			<a href="#/tasks/{{ task.pk }}"><strong>{{ task.description }}</strong></a> @ <a href="#/groups/{{ task.group.pk }}/">{{ task.group.name }}</a>
-		</li>
-	</ul>
-</span>
-
-Tasks Completed: <span ng-if="bucket.person.completedtasks.length == 0">No tasks completed yet</span> <br />
-<span ng-if="bucket.person.completedtasks.length != 0">
-	<ul>
-		<li ng-repeat="task in $parent.bucket.person.completedtasks">
-			<a href="#/tasks/{{ task.pk }}"><strong>{{ task.description }}</strong></a> @ <a href="#/groups/{{ task.group.pk }}/">{{ task.group.name }}</a>
-		</li>
-	</ul>
-</span>
-
-Badges: <span ng-if="bucket.person.badges.length == 0">No badges yet</span> <br />
-<span ng-if="bucket.person.badges.length != 0">
-	<ul>
-		<li ng-repeat="badge in $parent.bucket.person.badges">
-			{{ badge.name }}: <strong>{{ badge.points }}</strong>
-		</li>
-	</ul>
-</span>
+<!-- Gender: <span ng-if="bucket.person.gender === true">Female</span><span ng-if="bucket.person.gender === false">Male</span> <br /> -->

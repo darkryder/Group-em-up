@@ -1,26 +1,58 @@
-Name:  {{ bucket.group.name }} <br />
-Description:  {{ bucket.group.description }}<br />
-Points:  {{ bucket.group.points }}<br />
-Joining Key: {{ bucket.group.pk }}<br />
-Joining Code: {{ bucket.group.joining_code }}
+<div id="container" style="vertical-align:middle;">
+  <ul style="list-style: none;">
+		<h3 style="text-align:center;">Details</h3>
+    <li class="clearfix">
+    	<table style="border-spacing:10px 10px;border-collapse: separate;" >
+    		<tr>
+    			<td><strong>Name</strong></td><td>{{ bucket.group.name }}</td>
+    		</tr>
+    		<tr>
+    			<td><strong>Description</strong></td><td>{{ bucket.group.description }} </td>
+    		</tr>
+    		<tr>
+    			<td><strong>Points</strong></td><td>{{ bucket.group.points }}</td>
+    		</tr>
+    		<tr>
+    			<td><strong>Joining Key</strong></td><td>{{ bucket.group.pk }}</td>
+    		</tr>
+    		<tr>
+    			<td><strong>Joining Code</strong></td><td>{{ bucket.group.joining_code }}</td> <td><a ng-click="change_code(bucket.group.pk)" class="btn btn-danger" style="min-width:50%"> Change</a></td>
+    		</tr>
+    		<tr>
+    			<td><strong>Add as admin</strong></td>
+    			<td>
+    				<select ng-model="who_to_add" style="width:100%;">
+						<option value=""></option>
+						<optgroup ng-repeat="member in bucket.addable_as_admin">
+							<option value="{{ member.pk }}">{{ member.name }}</option>
+						</optgroup>
+					</select>
+				</td>
+				<td>
+					<button style="min-width:50%" ng-click='add_admin()' class="btn btn-info">Add</button>
+				</td>
+    		</tr>
 
-<span ng-if="bucket.deletable"> <a  ng-click="delete_group(bucket.group.pk)"> DELETE</a> </span><br />
-<br />
-<span ng-if="bucket.deletable"> <a  ng-click="change_code(bucket.group.pk)"> CHANGE CODE</a> </span><br />
-Add: <select ng-model="who_to_add">
-		<option value=""></option>
-		<optgroup ng-repeat="member in bucket.addable_as_admin">
-			<option value="{{ member.pk }}">{{ member.name }}</option>
-		</optgroup>
-	</select>
-	<button ng-click='add_admin()'>Add as admin</button>
-<br />
-
-	Remove: <select ng-model="who_to_remove">
-		<option value=""></option>
-		<optgroup ng-repeat="admin in bucket.group.admins">
-			<option value="{{ admin.pk }}">{{ admin.name }}</option>
-		</optgroup>
-	</select>
-	<button ng-click='remove_admin()'>Remove from admin</button>
-<br />
+    		<tr>
+    			<td><strong>Remove from admin</strong></td>
+    			<td>
+    				<select ng-model="who_to_remove" style="width:100%;">
+						<option value=""></option>
+						<optgroup ng-repeat="admin in bucket.group.admins">
+							<option value="{{ admin.pk }}">{{ admin.name }}</option>
+						</optgroup>
+					</select>
+				</td>
+				<td>
+					<button style="min-width:50%" ng-click='remove_admin()' class="btn btn-danger">Remove</button>
+				</td>
+    		</tr>
+    		<tr><td colspan="3" style="border-bottom: 1px solid black;"></td></tr>
+    		<tr>
+    			<td><button style="min-width:50%" ng-click='delete_group( bucket.group.pk)' class="btn btn-danger">Delete group</button></td>
+    			<td>This action is irrevocable. All the posts and tasks would be deleted.</td>
+    		</tr>
+    	</table>
+    </li>
+  </ul>
+</div>

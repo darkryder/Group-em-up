@@ -74,42 +74,99 @@
         -webkit-transform: scale(1.0);
       }
     }
+
+    .navbar-nav {
+      width: 100%;
+      text-align: center;
+    }
+    .navbar-nav > li {
+      float: none;
+      display: inline-block;
+    }
+
+  /** top header bar **/
+  /*header {
+    display: block;
+    position: fixed;
+    top: 0;
+    z-index: 9999;
+    height: 55px;
+    width: 100%;
+    max-width: 800px;
+    border-bottom: 1px solid #262422;
+    -webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+    background: #5a5955;
+    background: -moz-linear-gradient(top,  #5a5955 0%, #51504c 50%, #494744 51%, #3f3d3a 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#5a5955), color-stop(50%,#51504c), color-stop(51%,#494744), color-stop(100%,#3f3d3a));
+    background: -webkit-linear-gradient(top,  #5a5955 0%,#51504c 50%,#494744 51%,#3f3d3a 100%);
+    background: -o-linear-gradient(top,  #5a5955 0%,#51504c 50%,#494744 51%,#3f3d3a 100%);
+    background: -ms-linear-gradient(top,  #5a5955 0%,#51504c 50%,#494744 51%,#3f3d3a 100%);
+    background: linear-gradient(to bottom,  #5a5955 0%,#51504c 50%,#494744 51%,#3f3d3a 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5a5955', endColorstr='#3f3d3a',GradientType=0 );
+  }
+
+  header h1 {
+    font-size: 2.4em;
+    font-family: Tahoma, Arial, sans-serif;
+    font-weight: bold; line-height: 55px;
+    text-align: center;
+    color: #efefef;
+    text-shadow: 1px 1px 0px #000;
+  }*/
+
+  #container { display: block; margin-top: 15px; }
+  #container ul { /* empty */ }
+  #container ul li{
+    display: block;
+    width: 100%;
+    height: 10%;
+    border-bottom: 1px solid #b9b9b9;
+    border-top: 1px solid #f7f7f7;
+    padding: 5px 10px 5px 20px;
+    background: #ebebeb;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff) to(#ebebeb));
+    background-image: -webkit-linear-gradient(top, #ffffff, #ebebeb);
+    background-image:    -moz-linear-gradient(top, #ffffff, #ebebeb);
+    background-image:      -o-linear-gradient(top, #ffffff, #ebebeb);
+    background-image:         linear-gradient(top, #ffffff, #ebebeb);
+  }
+  a, a:visited, a:hover, a:active {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+  }
+
+  ul {
+   list-style: none;
+   margin: 0;
+   padding: 0;
+  }
     </style>
   </head>
   <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container" style="width:100%;">
-        <ul class="nav navbar-nav navbar-left ">
-          <li>
-            <a href="#/home/">Groupie</a>
-          </li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right ">
-          <li>
-            <div style="display:none" id="server-connection-spinner-base" class="spinner">
-              <span class="double-bounce1" id="server-connection-spinner-success"></span>
-              <span class="double-bounce2" id="server-connection-spinner-white"></span>
-              <span class="double-bounce3" id="server-connection-spinner-fail"></span>
-            </div>
-          </li>
-        </ul>       
-      </div>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+
+        <div>
+          <ul class="nav navbar-nav">
+            <li class="pull-left"><a href="#/home/">Groupie</a></li>
+            <li class="social pull-right">
+              <div style="display:none" id="server-connection-spinner-base" class="spinner">
+                <span class="double-bounce1" id="server-connection-spinner-success"></span>
+                <span class="double-bounce2" id="server-connection-spinner-white"></span>
+                <span class="double-bounce3" id="server-connection-spinner-fail"></span>
+              </div>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
     </nav>
 
-    <nav class="navbar navbar-inverse navbar-fixed-bottom">
-      <div class="container" style="">
-        <div class="row">
-          <div class="col-md-3 col-sm-3 col-xs-3 col-lg-3">
-            <a href="#/profile/"><span class="glyphicon glyphicon-user"></span></a>
-          </div>
-          <div class="col-md-offset-7 col-sm-offset-7 col-xs-offset-7 col-lg-offset-7 col-md-1 col-sm-1 col-xs-1 col-lg-1">
-            <a href="#/leaderboard/global/"><span class="glyphicon glyphicon-tower"></span></a>
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    <div class="container" style="padding-top:55px; padding-bottom:45px;">
+    <div class="container" style="padding-top:60px; padding-bottom:20px;">
       <div ng-view></div>
 
     </div> <!--/.container -->
@@ -125,9 +182,5 @@
 </html>
 <!-- 
 LINKS TO PUT SOMEWHERE OR THE OTHER. REMEMBER THEY EXIST
-HOME
-SIGNUP
-PROFILE
-ADD GROUP
 TEST CONNECTION WITH SERVER
  -->

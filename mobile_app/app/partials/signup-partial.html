@@ -1,19 +1,61 @@
-<h1>Signup Page</h1>
-
-First Name: <input type="text" ng-model="first_name" /><br />
-Last Name: <input type="text" ng-model="last_name" /><br />
-Email: <input type="text" ng-model="email"><br />
-Gender: <select ng-model="gender"><option value="male">Male</option><option value="female">Female</option></select><br />
-<input type="button" value="Signup now" ng-click="signup()" /><br/>
-<hr />
-
-<strong>Already have an account ?</strong>
-<br />
-Email: <input type="text" ng-model="lost_email">
-<button ng-click="get_lost_password_mail()">Get login code!</button><br />
-
-
-<strong>Already have an access code ?</strong>
-<br />
-Access Code: <input type="text" ng-model="lost_access_code">
-<button ng-click="give_lost_access_code()">Login!</button><br />
+<h1>Welcome :)</h1>
+<div id="container" style="vertical-align:middle;">
+  <ul style="list-style: none;">
+    <li class="clearfix">
+    	<table style="border-spacing:10px 10px;border-collapse: separate;" >
+    		<tr>
+    			<td><strong>First name: </strong></td>
+    			<td>
+    				<input style="max-width:80%" type="text" ng-model="first_name" />
+				</td>
+    		</tr>
+    		<tr>
+    			<td><strong>Last name: </strong></td>
+    			<td><input style="max-width:80%" type="text" ng-model="last_name" /></td>
+    		</tr>
+    		<tr>
+    			<td><strong>Email: </strong></td>
+    			<td>
+    				<input style="max-width:80%" type="text" ng-model="email">
+    			</td>
+    		</tr>
+    		<tr>
+    			<td><strong>Gender:</strong></td>
+    			<td>
+    				<select  style="max-width:80%"  ng-model="gender"><option value="male">Male</option><option value="female">Female</option></select>
+    			</td>
+    		</tr>
+    		<tr>
+	    		<td></td>
+    			<td><button ng-click='signup()' class="btn btn-success">Signup!</button></td>
+    		</tr>
+    	</table>
+    </li>
+    <li>
+    	<h5><strong>Already have an account ?</strong></h5>
+    	<table style="border-spacing:10px 10px;border-collapse: separate;" >
+    		<tr>
+    			<td style="padding-right:10px;"><strong>Email:</strong></td>
+    			<td> <input style="max-width:80%" type="text" ng-model="lost_email"></td>
+    		</tr>
+    		<tr><td></td><td><button class="btn btn-success" ng-click="get_lost_password_mail()">Get access code!</button></td></tr>
+    	</table>
+    </li>
+    <li>
+    	<h5><strong>Received an access code ?</strong></h5>
+    	<table style="border-spacing:10px 10px;border-collapse: separate;" >
+    		<tr>
+    			<td style="padding-right:10px;"><strong>Access Code: </strong></td>
+    			<td><input style="max-width:80%" type="text" ng-model="lost_access_code"></td>
+    		</tr>
+    		<tr>
+    			<td></td>
+    			<td>
+    				<button class="btn btn-info" ng-click="give_lost_access_code()">Login!</button>
+    			</td>
+    		</tr>
+    	</table>
+    </li>
+    <hr />
+  </ul>
+</div>

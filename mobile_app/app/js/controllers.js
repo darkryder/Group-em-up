@@ -18,8 +18,8 @@
  */
 var _hiddenCommonData = {
 	storage: window.localStorage,
-	api_link: "http://blooming-badlands-6507.herokuapp.com/stuff/",
-}
+	api_link: "http://blooming-badlands-6507.herokuapp.com/stuff/"
+};
 
 
 /* Common functions used throughout the app
@@ -218,6 +218,11 @@ groupieAppControllers.controller('homePageController', ['$scope', '$http', '$loc
 
 		$scope.response_from_server = "Nothing"
 
+		if (!commonFunctions.is_logged_in()){
+			console.log("not logged in");
+			$location.path("signup/");
+		}
+
 		$scope.server_test = function(){
 
 			var temp = $http.get('https://blooming-badlands-6507.herokuapp.com/stuff/test/');
@@ -225,7 +230,7 @@ groupieAppControllers.controller('homePageController', ['$scope', '$http', '$loc
 			console.log("Sending");
 			temp.success(function(data){
 				// $scope.response_from_server = JSON.parse(JSON.stringify(data))['result'];
-				$scope.response_from_server = data['result']
+				$scope.response_from_server = data['result'];
 				console.log(JSON.stringify(data));
 				console.log("success")
 			})
@@ -236,7 +241,11 @@ groupieAppControllers.controller('homePageController', ['$scope', '$http', '$loc
 				
 			})
 		}
+	}]);
 
+groupieAppControllers.controller('browsePageController', ['$scope', '$http', '$location',
+	function($scope, $http, $location){
+		
 		$scope.join_private_group = function(){
 			commonFunctions.show_server_contact_attempt();
 			var which_pk = $scope.private_group_pk;
@@ -259,10 +268,35 @@ groupieAppControllers.controller('homePageController', ['$scope', '$http', '$loc
 					console.log("error data " + data);
 					console.log("error status " + status);
 					commonFunctions.show_server_contact_failed();
+				})	
+		}
+
+		$scope.bucket = {'groups':[]}
+
+		if (!commonFunctions.is_logged_in()){
+			console.log("not logged in");
+			$location.path("signup/");
+		} else {
+			var auth_data = commonFunctions.get_auth_data();
+			commonFunctions.show_server_contact_attempt();
+
+			$http.post(commonFunctions.get_api_link() + 'home/', auth_data).
+				success(function(data){
+					if (commonFunctions.api_call_successfull(data)){
+						commonFunctions.hide_server_contact();
+						$scope.bucket.groups = data.data;
+						console.log("fetched home details" + JSON.stringify(data));
+					} else {
+						commonFunctions.show_server_contact_failed();
+						console.log("API call unsuccessful. " + JSON.stringify(data.reason));	
+					}
+				}).
+				error(function(data, status){
+					commonFunctions.show_server_contact_failed();
+					console.log("failed");
 				})
 		}
-	}]);
-
+	}])
 
 /* Profile controller
  * If user is not logged in, it is redirected to signup page, which has the option of password reset too
@@ -495,6 +529,7 @@ groupieAppControllers.controller('groupsNewController', ['$scope', '$location', 
 							commonFunctions.hide_server_contact();
 							console.log("new group created");
 							console.log(JSON.stringify(data));
+							$location.path("groups/" + data.data.pk + '/');
 						} else {
 							commonFunctions.show_server_contact_failed();
 							console.log("API call: response from server. result false");
@@ -691,6 +726,7 @@ groupieAppControllers.controller('groupSpecificViewController', ['$scope', '$htt
 						if (commonFunctions.api_call_successfull(data)){
 							commonFunctions.hide_server_contact();
 							console.log("DONE: " + JSON.stringify(data));
+							$location.path("tasks/" + data.data.pk)
 						} else{
 							commonFunctions.show_server_contact_failed();
 							console.log("API call: response from server. result false");
@@ -716,6 +752,8 @@ groupieAppControllers.controller('taskSpecificViewController', ['$scope', '$loca
 			$scope.completedby = ""
 			$scope.bucket = {task: commonFunctions.get_empty_task_object()};
 
+			$scope.leavableTask = false;
+
 			commonFunctions.show_server_contact_attempt()
 			commonFunctions.fetch_task_details($http, task_pk).
 				success(function(data){
@@ -723,6 +761,12 @@ groupieAppControllers.controller('taskSpecificViewController', ['$scope', '$loca
 						commonFunctions.hide_server_contact();
 						$scope.bucket.task = data.data;
 						console.log("DONE: " + JSON.stringify(data));
+						for(var i = 0; i < data.data.assignedto.length; i++){
+							if (data.data.assignedto[i].pk == commonFunctions.get_auth_data().pk){
+								$scope.leavableTask = true;
+								break;
+							}
+						}
 					} else{
 						commonFunctions.show_server_contact_failed();
 						console.log("API call: response from server. result false");
@@ -794,6 +838,7 @@ groupieAppControllers.controller('taskSpecificViewController', ['$scope', '$loca
 							commonFunctions.hide_server_contact();
 							$scope.bucket.task = data.data;
 							console.log("DONE: " + JSON.stringify(data));
+							$route.reload()
 						} else{
 							commonFunctions.show_server_contact_failed();
 							console.log("API call: response from server. result false");
@@ -818,6 +863,7 @@ groupieAppControllers.controller('taskSpecificViewController', ['$scope', '$loca
 							commonFunctions.hide_server_contact();
 							$scope.bucket.task = data.data;
 							console.log("DONE: " + JSON.stringify(data));
+							$location.path("/")
 						} else{
 							commonFunctions.show_server_contact_failed();
 							console.log("API call: response from server. result false");
@@ -944,7 +990,7 @@ groupieAppControllers.controller('groupAdminController', ['$scope', '$http', '$r
 							commonFunctions.hide_server_contact();
 							console.log("CODE CHANGED");
 							console.log(JSON.stringify(data));
-
+							$route.reload();
 						} else {
 							commonFunctions.show_server_contact_failed();
 							console.log("API call: response from server. result false");
