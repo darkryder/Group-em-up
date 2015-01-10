@@ -565,6 +565,7 @@ def get_task_details(request, pk):
                             },
                             "points": task.points,
             }
+            response['data']['admin'] = True if (user in task.assigner.all() or user in task.group.first().admins.all()) else False
             response['data']['completedby'] = {"name": task.completedby.first().full_name(), "pk": task.completedby.first().pk} if \
                                                 task.completedby.all() else None
         else:
