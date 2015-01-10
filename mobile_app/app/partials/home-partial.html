@@ -1,4 +1,4 @@
-<div style="text-align:center;">
+<div style="text-align:center; margin-top:3%;" >
 	<canvas id="paint" style="border:1px solid #000000; display: inline;"></canvas>
 </div>
 <script type="text/javascript">
@@ -18,7 +18,8 @@
 	var moveableRadius = 0.05 * w;
 	var radiusAtPoints = 0.1 * w;
 
-	ctx.shadowBlur = 25;
+	var init_showBlur = 0;
+	ctx.shadowBlur = init_showBlur;
 	ctx.shadowColor = "rgb(0, 0, 0)";
 	ctx.textAlign = "center";
 
@@ -30,7 +31,7 @@
 				window.location.assign("#/browse/");
 			});
 		}},
-		{'x': w/2 , 'y': 0, 'text': "Create group", 'alreadyTriggered': false,'action': function(){
+		{'x': w/2 , 'y': 0, 'text': "New group", 'alreadyTriggered': false,'action': function(){
 			baseActionHandler(this, function(){
 				window.location.assign("#/groups/new/");
 			});
@@ -128,10 +129,10 @@
 			ctx.closePath();
 		}
 		ctx.fillStyle = "rgba(0, 0, 0, 1)";
+		ctx.shadowBlur = init_showBlur + _increase*5;
 		ctx.fill();
-
-		ctx.fillStyle = "rgba(0, 255, 0," + (_increase/(radiusAtPoints - moveableRadius) - 0.2) + ")";
-		ctx.font = "bold " +  (_size/200) + "em" + " Georgia";
+		ctx.fillStyle = "rgba(46, 3, 92," + (_increase/(radiusAtPoints - moveableRadius) - 0.2) + ")";
+		ctx.font = "bold " +  (_size/200) + "em" + " Courier New";
 		ctx.fillText(decisionPoints[nearestPointIndex].text, initCenterX, initCenterY)
 
 
@@ -145,8 +146,8 @@
 	}
 
 	baseActionHandler = function(decisionPoint, next){
-		ctx.fillStyle = "rgba(255, 0, 0, 1)";
-		ctx.font = "bold " +  (_size/200) + "em" + " Georgia";
+		ctx.fillStyle = "rgba(0, 0, 0, 1)";
+		ctx.font = "bold " +  (_size/200) + "em" + " Courier New";
 		ctx.fillText(decisionPoint.text, initCenterX, initCenterY);
 		actionTaken = true;
 		

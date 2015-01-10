@@ -1,7 +1,6 @@
 <div id="container" style="vertical-align:middle;">
   <ul style="list-style: none;">
 		<h3 style="text-align:center;">Details</h3>
-    <li class="clearfix">
     	<table style="border-spacing:10px 10px;border-collapse: separate;" >
     		<tr>
     			<td><strong>Name</strong></td><td>{{ bucket.group.name }}</td>
@@ -29,7 +28,7 @@
 					</select>
 				</td>
 				<td>
-					<button style="min-width:50%" ng-click='add_admin()' class="btn btn-info">Add</button>
+					<button style="min-width:50%; background-color:#5c0055; border-color: #5c0055" ng-click='add_admin()' class="btn btn-info">Add</button>
 				</td>
     		</tr>
 
@@ -53,6 +52,5 @@
     			<td>This action is irrevocable. All the posts and tasks would be deleted.</td>
     		</tr>
     	</table>
-    </li>
   </ul>
 </div>

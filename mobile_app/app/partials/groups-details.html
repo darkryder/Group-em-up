@@ -4,30 +4,28 @@
 		<a class="btn btn-warning pull-right btn-sm" style="padding:5px 5px 5px 5px;" href="#/groups/admin/{{ bucket.group.pk }}/">Manage Group</a>
 	</span>
 	<span ng-show="bucket.group.name != ''">
-		<a href="#/leaderboard/group/{{ bucket.group.pk }}" class="btn btn-info pull-right btn-sm" >Leaderboard</a>
+		<a style="margin-right:10px; background-color:#5c0055; border-color: #5c0055; color:#ffffff;" href="#/leaderboard/group/{{ bucket.group.pk }}" class="btn btn-info pull-right btn-sm" >Leaderboard</a>
 	</span>
 
     <h4 >Details</h4>
-    <li class="clearfix">
+    <span class="clearfix">
 		<h5 style="text-align:center"><span ng-show="bucket.group.name == ''">Name</span>
 		<span ng-show="bucket.group.name != ''"> 
-		{{ bucket.group.name }}
+		<strong>Name: </strong>{{ bucket.group.name }}
 		</span></h5>					
-    </li>
+    </span>
     
-    <li class="clearfix">
+    <span class="clearfix">
 		<h5 style="text-align:center"><span ng-show="bucket.group.name == ''">Description</span>
 		<span ng-show="bucket.group.name != ''"> 
-		{{ bucket.group.description}}
+		<strong>Description: </strong>{{ bucket.group.description}}
 		</span></h5>	
-    </li>
+    </span>
 
-    <li class="clearfix">
 		<h5 style="text-align:center"><span ng-show="bucket.group.name == ''">Points</span>
 		<span ng-show="bucket.group.name != ''"> 
 		<strong>Points:</strong> {{ bucket.group.points }}
 		</span></h5>					
-    </li>
     
     <hr />
     <h4 class="clearfix">Members
@@ -69,7 +67,7 @@
     <hr />
     <h4 class="clearfix">
     	Posts
-    	<span ng-show="bucket.admin"> <a class="pull-right btn btn-info btn-sm" href="#/posts/new/{{bucket.group.pk}}/">Add post</a></span>
+    	<span ng-show="bucket.admin"> <a style=" background-color:#5c0055; border-color: #5c0055; color:#ffffff;" class="pull-right btn btn-info btn-sm" href="#/posts/new/{{bucket.group.pk}}/">Add post</a></span>
     </h4>
     <li class="clearfix" ng-show="bucket.group.posts.length == 0">
 		<h5 style="text-align:center">
@@ -87,7 +85,7 @@
     <hr />
     <h4 class="clearfix">
     	Tasks
-    	<span ng-show="bucket.admin"> <a class="pull-right btn btn-info btn-sm" href="#/tasks/new/{{bucket.group.pk}}/">Add Task</a></span>
+    	<span ng-show="bucket.admin"> <a style=" background-color:#5c0055; border-color: #5c0055; color:#ffffff;" class="pull-right btn btn-info btn-sm" href="#/tasks/new/{{bucket.group.pk}}/">Add Task</a></span>
     </h4>
     <li class="clearfix" ng-show="bucket.group.tasks.length == 0">
 		<h5 style="text-align:center">
