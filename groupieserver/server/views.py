@@ -4,6 +4,32 @@ import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
+from django import forms
+
+class SignupForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
+    # gender = forms.ChoiceField(required=True, choices=((True, True), (False, False)))
+    # first_name = forms.TextField(required=True)
+    # last_name = forms.TextField(required=True)
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'gender', 'email')
+
+class NewGroupForm(forms.ModelForm):
+    class Meta:
+        model = Group
+        fields = ('name', 'description', 'private')
+
+class NewPostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('description',)
+
+class NewTaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ('description', 'points')
+
 
 @csrf_exempt
 def is_logged_in(request):
@@ -50,10 +76,9 @@ def signup(request):
         # import pdb
         # pdb.set_trace()
         try:
-            user = User.objects.create(first_name=request.POST['first_name'],
-                                last_name = request.POST['last_name'],
-                                gender = json.loads(request.POST['gender']),
-                                email = request.POST['email'])
+            form = SignupForm(request.POST)
+            if form.is_valid():
+                user = form.save()
 
             response['result'] = True
             response['message'] = "Signed up"
@@ -115,8 +140,12 @@ def create_group(request):
     user = is_logged_in(request)
     if user:
         try:
-            group = Group.objects.create(name=request.POST['name'],
-                description=request.POST['description'], private=json.loads(request.POST.get('private', "false")))
+            # import pdb
+            # pdb.set_trace()
+            form = NewGroupForm(request.POST)
+            if form.is_valid():
+                group = form.save()
+
             user.groups.add(group)
             user.adminOf.add(group)
             user.save()
@@ -370,7 +399,10 @@ def create_new_post(request, group_pk):
             group = group[0]
             if group in user.groups.all(): 
                 try:
-                    post = Post.objects.create(description=request.POST['description'])
+                    form = NewPostForm(request.POST)
+                    if form.is_valid():
+                        post = form.save()
+
                     post.OP.add(user)
                     post.save()
                     group.posts.add(post)
@@ -469,8 +501,10 @@ def create_task(request, group_pk):
                     response['reason'] = "You must allot between 0 and 100 points"
                     return HttpResponse(json.dumps(response), content_type="application/json")    
 
-                task = Task.objects.create(description=request.POST['description'],
-                        points = int(request.POST.get('points', 10)))
+                form = NewTaskForm(request.POST)
+                if form.is_valid():
+                    task = form.save()
+
                 task.assigner.add(user)
                 group.tasks.add(task)
                 task.save()
@@ -508,8 +542,11 @@ def create_task_specific_to_person(request, group_pk, person_pk):
                 return HttpResponse(json.dumps(response), content_type="application/json")
             if all([x in group.members.all() for x in [person, user]]):
                 try:
-                    task = Task.objects.create(description=request.POST['description'],
-                        points = int(request.POST.get('points', 10)))
+
+                    form = NewTaskForm(request.POST)
+                    if form.is_valid():
+                        task = form.save()
+
                     task.assignedto.add(person)
                     task.assigner.add(user)
                     group.tasks.add(task)
@@ -719,6 +756,7 @@ def group_leaderboard(request, pk):
                 for task in member.completedtasks.all():
                     if group in task.group.all():
                         points += task.points
+                if points <= 0: continue
                 answer.append({
                     "name": member.full_name(),
                     "pk":  member.pk,
@@ -815,6 +853,7 @@ def global_leaderboard(request):
     if user:        
         answer = []
         for p in User.objects.order_by('-points')[:25]:
+            if p.points <= 0: continue
             answer.append({
                 "name": p.full_name(),
                 "pk": p.pk,
