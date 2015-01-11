@@ -38,7 +38,7 @@
 				<td><a href="#/person/{{ bucket.task.assigner.pk}}">{{ bucket.task.assigner.name }}</td>
 			</tr>
 			<tr>
-				<td><strong>Taken up by: </strong></td>
+				<td ng-show="bucket.task.assignedto.length!=0"><strong>Taken up by: </strong></td>
 				<td>
 					<ul>
 						<li style="margin:5xp; padding:5px;" ng-repeat="p in bucket.task.assignedto">
@@ -60,7 +60,7 @@
 					<button class="btn btn-warning" ng-if="bucket.task.ismember && leavableTask" ng-click="reject_task()">Leave</button>
 				</td>
 			</tr>
-			<tr ng-show="bucket.task.admin && bucket.task.completedby == null">
+			<tr ng-show="bucket.task.admin && bucket.task.completedby == null && bucket.task.assignedto.length!=0">
 				<td>
 					<select style="max-width:70%" ng-model="completedby">
 						<optgroup ng-repeat="person in bucket.task.assignedto">
