@@ -1,5 +1,5 @@
 {
-  "version": "0.0 dev.",
+  "version": "0.0.1",
   "name": "Groupie",
   "description": "Get work done, in a more fun, collaborative way",
   "launch_path": "/app/index.html",
