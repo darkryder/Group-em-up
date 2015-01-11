@@ -12,6 +12,7 @@
     </li>
     <li class="clearfix" ng-show="wall.length != 0" ng-repeat="person in wall">
 		<h5 style="text-align:center">
+            <i ng-if="$index==0" class="fa fa-trophy" style="color:gold;"></i>
 			<a href="#/person/{{person.pk}}/"><strong>{{ person.name }}: </strong>{{person.points}} </a> 
 		</h5>	
     </li>
