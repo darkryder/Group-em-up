@@ -310,7 +310,7 @@ groupieAppControllers.controller('profilePageController', ['$scope', '$http', '$
 
 		$scope.bucket = {person: commonFunctions.get_empty_person_object()};
 
-		if (!commonFunctions.is_logged_in()){
+	if (!commonFunctions.is_logged_in()){
 			console.log("not logged in");
 			$location.path("signup/");
 		}

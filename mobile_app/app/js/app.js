@@ -68,6 +68,9 @@ groupieApp.config(['$routeProvider',
 				templateUrl: 'partials/leaderboard-global.html',
 				controller: 'leaderboardGlobalController'
 			}).
+			when('/credits', {
+				templateUrl: 'partials/credits.html'
+			}).
 			otherwise({
 				redirectTo: '/home/'
 			});
