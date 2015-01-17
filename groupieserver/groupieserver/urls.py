@@ -9,6 +9,6 @@ urlpatterns = patterns('',
     # url(r'^$', 'groupieserver.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^really/admin/urlisthis/', include(admin.site.urls)),
     url(r'^stuff/', include(urls)),
 )

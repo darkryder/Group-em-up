@@ -26,12 +26,19 @@ class Task(models.Model):
 		return any([self.group.first().show_to(user), user in self.group.first().members.all(),
 						user in self.group.first().admins.all(), self.isassigner(user), self.isassignee(user)])
 
+	def __unicode__(self):
+		return self.description
+
 class Post(models.Model):
 	description = models.CharField(max_length=1024)
 
 	def show_to(self, user):
 		return any([user in self.OP.all(), self.group.first().show_to(user), 
 				user in self.group.first().members.all(), user in self.group.first().admins.all()])
+
+	def __unicode__(self):
+		return self.description
+
 
 def generate_code(q, numeric=False):
 	import string
@@ -64,9 +71,15 @@ class Group(models.Model):
 	def show_to(self, user):
 		return any([not self.private, user in self.members.all(), user in self.admins.all()])
 
+	def __unicode__(self):
+		return self.name
+
 class Badge(models.Model):
 	name = models.CharField(max_length=32)
 	points = models.IntegerField(max_length=2, blank=False, default=10)
+	
+	def __unicode__(self):
+		return self.name
 
 	# when you join your first group
 	@staticmethod
@@ -153,7 +166,12 @@ class User(models.Model):
 	def name(self):
 		return self.full_name
 
+	def __unicode__(self):
+		return " ".join([self.first_name, self.last_name])
 
 class ForgotPasswordRequest(models.Model):
 	key1 = models.CharField(max_length=10, default=lambda: generate_code(10, numeric=True))
 	user = models.OneToOneField(User, related_name='forgotPasswordRequest')
+
+	def __unicode__(self):
+		return str(self.user)
